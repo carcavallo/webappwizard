@@ -1,21 +1,16 @@
 <?php
-
 namespace PR24\Controller;
 
 class ErrorController {
     public function handleNotFound() {
-        $response = [
-            'message' => 'Not Found'
-        ];
+        header('Content-Type: application/json');
         http_response_code(404);
-        echo json_encode($response);
+        echo json_encode(['message' => 'Not Found']);
     }
 
-    public function handleServerError() {
-        $response = [
-            'message' => 'Internal Server Error'
-        ];
+    public function handleServerError($e) {
+        header('Content-Type: application/json');
         http_response_code(500);
-        echo json_encode($response);
+        echo json_encode(['message' => 'Internal Server Error', 'error' => $e->getMessage()]);
     }
 }
