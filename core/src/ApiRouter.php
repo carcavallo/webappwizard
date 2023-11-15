@@ -46,9 +46,11 @@ class ApiRouter {
         // Additional patient CRUD routes
 
         // Score related routes
+        /*
         $this->router->post('/api/score/calculate', function() use ($scoreController) {
             $scoreController->calculateScore($_REQUEST);
         });
+        */
         // Additional score CRUD routes
 
         // Error handling routes
