@@ -4,7 +4,7 @@ namespace PR24;
 use Bramus\Router\Router;
 use PR24\Controller\DoctorController;
 use PR24\Controller\PatientController;
-use PR24\Controller\ScoreController;
+//use PR24\Controller\ScoreController;
 use PR24\Controller\ErrorController;
 use PR24\Model\DoctorModel;
 use PR24\Model\PatientModel;
@@ -17,7 +17,7 @@ class ApiRouter {
 
     public function __construct() {
         $this->router = new Router();
-        $this->pdo = new PDO('mysql:host=localhost;dbname=flip_flop_score_db', 'root', 'toor');
+        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'toor');
         $this->setupRoutes();
     }
 
@@ -29,7 +29,7 @@ class ApiRouter {
 
         $DoctorController = new DoctorController($doctorModel);
         $patientController = new PatientController($patientModel);
-        $scoreController = new ScoreController($scoreModel);
+        //$scoreController = new ScoreController($scoreModel);
 
         $this->router->setNamespace('\PR24\Controller');
 
@@ -52,8 +52,7 @@ class ApiRouter {
         // Additional score CRUD routes
 
         // Error handling routes
-        $this->router->set404([$errorController, 'handleNotFound']);
-        $this->router->setErrorHander([$errorController, 'handleServerError']);
+        $this->router->set404($errorController->handleNotFound());
     }
 
     public function run() {
