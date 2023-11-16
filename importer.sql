@@ -1,6 +1,6 @@
 -- Create database if it does not exist
-CREATE DATABASE IF NOT EXISTS `flip_flop_score_db`;
-USE `flip_flop_score_db`;
+CREATE DATABASE IF NOT EXISTS `webappwizard`;
+USE `webappwizard`;
 
 -- Create `admins` table
 CREATE TABLE `admins` (
@@ -24,6 +24,7 @@ CREATE TABLE `doctors` (
   `arbeitsstelle_land` VARCHAR(100) DEFAULT NULL,
   `taetigkeitsbereich` ENUM('Patientenversorgung','Forschung','Arzneimittelentwicklung','Sonstiges') NOT NULL,
   `taetigkeitsbereich_sonstiges` VARCHAR(255) DEFAULT NULL,
+  `activated` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

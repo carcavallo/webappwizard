@@ -10,24 +10,26 @@ class DoctorController {
         $this->doctorModel = $doctorModel;
     }
 
-    public function register($request) {
+    public function register() {
 
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+
+        // Extract data from the decoded JSON
         $registrationData = [
-            'anrede' => $request['anrede'] ?? null,
-            'titel' => $request['titel'] ?? null,
-            'vorname' => $request['vorname'] ?? null,
-            'nachname' => $request['nachname'] ?? null,
-            'email' => $request['email'] ?? null,
-            'arbeitsstelle_name' => $request['arbeitsstelle_name'] ?? null,
-            'arbeitsstelle_adresse' => $request['arbeitsstelle_adresse'] ?? null,
-            'arbeitsstelle_stadt' => $request['arbeitsstelle_stadt'] ?? null,
-            'arbeitsstelle_plz' => $request['arbeitsstelle_plz'] ?? null,
-            'arbeitsstelle_land' => $request['arbeitsstelle_land'] ?? null,
-            'taetigkeitsbereich' => $request['taetigkeitsbereich'] ?? null,
-            'taetigkeitsbereich_sonstiges' => $request['taetigkeitsbereich_sonstiges'] ?? null
+            'anrede' => $requestBody['anrede'] ?? null,
+            'titel' => $requestBody['titel'] ?? null,
+            'vorname' => $requestBody['vorname'] ?? null,
+            'nachname' => $requestBody['nachname'] ?? null,
+            'email' => $requestBody['email'] ?? null,
+            'arbeitsstelle_name' => $requestBody['arbeitsstelle_name'] ?? null,
+            'arbeitsstelle_adresse' => $requestBody['arbeitsstelle_adresse'] ?? null,
+            'arbeitsstelle_stadt' => $requestBody['arbeitsstelle_stadt'] ?? null,
+            'arbeitsstelle_plz' => $requestBody['arbeitsstelle_plz'] ?? null,
+            'arbeitsstelle_land' => $requestBody['arbeitsstelle_land'] ?? null,
+            'taetigkeitsbereich' => $requestBody['taetigkeitsbereich'] ?? null,
+            'taetigkeitsbereich_sonstiges' => $requestBody['taetigkeitsbereich_sonstiges'] ?? null
         ];
         
-
         // Data validation
         if (!$this->validateRegistrationData($registrationData)) {
             return ['status' => 'error', 'message' => 'Invalid registration data'];

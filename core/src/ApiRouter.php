@@ -3,12 +3,12 @@ namespace PR24;
 
 use Bramus\Router\Router;
 use PR24\Controller\DoctorController;
-use PR24\Controller\PatientController;
+//use PR24\Controller\PatientController;
 //use PR24\Controller\ScoreController;
 use PR24\Controller\ErrorController;
 use PR24\Model\DoctorModel;
-use PR24\Model\PatientModel;
-use PR24\Model\ScoreModel;
+//use PR24\Model\PatientModel;
+//use PR24\Model\ScoreModel;
 use PDO;
 
 class ApiRouter {
@@ -17,32 +17,38 @@ class ApiRouter {
 
     public function __construct() {
         $this->router = new Router();
-        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'toor');
+        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'kU7~51ft7`aQ');
         $this->setupRoutes();
     }
 
     private function setupRoutes() {
         $doctorModel = new DoctorModel($this->pdo);
-        $patientModel = new PatientModel($this->pdo);
-        $scoreModel = new ScoreModel($this->pdo);
+        //$patientModel = new PatientModel($this->pdo);
+        //$scoreModel = new ScoreModel($this->pdo);
         $errorController = new ErrorController();
 
         $DoctorController = new DoctorController($doctorModel);
-        $patientController = new PatientController($patientModel);
+        //$patientController = new PatientController($patientModel);
         //$scoreController = new ScoreController($scoreModel);
 
         $this->router->setNamespace('\PR24\Controller');
 
         $this->router->post('/api/register', function() use ($DoctorController) {
-            $DoctorController->register($_REQUEST);
+            $response = $DoctorController->register();
+            echo json_encode($response);
         });
+        
         $this->router->get('/api/activate/{userId}', function($userId) use ($DoctorController) {
-            $DoctorController->activateUser($userId);
+            $response = $DoctorController->activateUser($userId);
+            echo json_encode($response);
         });
 
+        /*
         $this->router->post('/api/patient/create', function() use ($patientController) {
             $patientController->createPatient($_REQUEST);
         });
+        */
+            
         // Additional patient CRUD routes
 
         // Score related routes
@@ -54,7 +60,7 @@ class ApiRouter {
         // Additional score CRUD routes
 
         // Error handling routes
-        $this->router->set404($errorController->handleNotFound());
+        //$this->router->set404($errorController->handleNotFound());
     }
 
     public function run() {

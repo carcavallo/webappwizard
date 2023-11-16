@@ -37,6 +37,26 @@ class DoctorModel {
         }
     }
 
+    public function activateDoctor($doctorId) {
+        $sql = "UPDATE doctors SET activated = 1 WHERE id = :id";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $doctorId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            // Handle exception
+            error_log('PDOException in activateDoctor: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getDoctorById($doctorId) {
         $sql = "SELECT * FROM doctors WHERE id = :id";
 
