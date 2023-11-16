@@ -21,6 +21,15 @@ class ApiRouter {
         $this->setupRoutes();
     }
 
+    private function authenticateJWT($token) {
+        try {
+            $decoded = JWT::decode($token, new Key('BhPGQGyPuIkRz+hzMlfCsgaFNjKPSYgFjX73+LPf5k4=', 'HS256'));
+            return $decoded;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     private function setupRoutes() {
         $doctorModel = new DoctorModel($this->pdo);
         $patientModel = new PatientModel($this->pdo);
@@ -33,6 +42,11 @@ class ApiRouter {
 
         $this->router->setNamespace('\PR24\Controller');
 
+        $this->router->post('/api/login', function() use ($doctorController) {
+            $response = $doctorController->authenticate();
+            echo json_encode($response);
+        });
+
         $this->router->post('/api/register', function() use ($doctorController) {
             $response = $doctorController->register();
             echo json_encode($response);
@@ -44,9 +58,19 @@ class ApiRouter {
         });
 
         $this->router->post('/api/patient', function() use ($patientController) {
+            $headers = getallheaders();
+            $jwt = $headers['Authorization'] ?? '';
+        
+            if (!$this->authenticateJWT($jwt)) {
+                header('HTTP/1.0 401 Unauthorized');
+                echo json_encode(['message' => 'Unauthorized']);
+                exit();
+            }
+        
             $response = $patientController->createPatient();
             echo json_encode($response);
         });
+        
 
         /*
         $this->router->post('/api/patient/create', function() use ($patientController) {

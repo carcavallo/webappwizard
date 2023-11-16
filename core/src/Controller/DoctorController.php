@@ -2,12 +2,34 @@
 namespace PR24\Controller;
 
 use PR24\Model\DoctorModel;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class DoctorController {
     protected $doctorModel;
 
     public function __construct(DoctorModel $doctorModel) {
         $this->doctorModel = $doctorModel;
+    }
+
+    public function authenticate() {
+        $credentials = json_decode(file_get_contents('php://input'), true);
+
+        if ($this->doctorModel->validateCredentials($credentials['email'], $credentials['password'])) {
+            $issuedAt = time();
+            $expirationTime = $issuedAt + 3600;  // Token valid for 1 hour
+            $payload = [
+                'iat' => $issuedAt,
+                'exp' => $expirationTime,
+                'email' => $credentials['email']
+            ];
+
+            $jwt = JWT::encode($payload, 'your_secret_key', 'HS256');  // Replace 'your_secret_key' with your actual secret key
+
+            return ['status' => 'success', 'token' => $jwt];
+        } else {
+            return ['status' => 'error', 'message' => 'Invalid credentials'];
+        }
     }
 
     public function register() {

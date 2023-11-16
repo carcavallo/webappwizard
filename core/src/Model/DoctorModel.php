@@ -12,6 +12,9 @@ class DoctorModel {
     }
 
     public function createDoctor($doctorData) {
+        $hashedPassword = password_hash($doctorData['password'], PASSWORD_DEFAULT);
+        $doctorData['password'] = $hashedPassword;
+        
         $sql = "INSERT INTO doctors (anrede, titel, vorname, nachname, email, arbeitsstelle_name, arbeitsstelle_adresse, arbeitsstelle_stadt, arbeitsstelle_plz, arbeitsstelle_land, taetigkeitsbereich, taetigkeitsbereich_sonstiges) VALUES (:anrede, :titel, :vorname, :nachname, :email, :arbeitsstelle_name, :arbeitsstelle_adresse, :arbeitsstelle_stadt, :arbeitsstelle_plz, :arbeitsstelle_land, :taetigkeitsbereich, :taetigkeitsbereich_sonstiges)";
 
         try {
@@ -73,6 +76,17 @@ class DoctorModel {
             error_log('PDOException in activateDoctor: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function validateCredentials($email, $password) {
+        $stmt = $this->db->prepare("SELECT password FROM doctors WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $storedPassword = $stmt->fetchColumn();
+
+        if ($storedPassword && password_verify($password, $storedPassword)) {
+            return true;
+        }
+        return false;
     }
     /*
     public function getDoctorById($doctorId) {
