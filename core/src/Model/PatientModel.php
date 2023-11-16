@@ -19,11 +19,11 @@ class PatientModel {
             $stmt->execute($patientData);
             return $this->db->lastInsertId();
         } catch (PDOException $e) {
-            // Log error or handle exception
+            error_log("PDOException in createPatient: " . $e->getMessage());
             return false;
         }
     }
-
+    /*
     public function getPatientById($patientId) {
         $sql = "SELECT * FROM patients WHERE id = :id";
 
@@ -66,6 +66,6 @@ class PatientModel {
             return false;
         }
     }
-    
+    */
 
 }

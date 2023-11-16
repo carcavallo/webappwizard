@@ -3,11 +3,11 @@ namespace PR24;
 
 use Bramus\Router\Router;
 use PR24\Controller\DoctorController;
-//use PR24\Controller\PatientController;
+use PR24\Controller\PatientController;
 //use PR24\Controller\ScoreController;
 use PR24\Controller\ErrorController;
 use PR24\Model\DoctorModel;
-//use PR24\Model\PatientModel;
+use PR24\Model\PatientModel;
 //use PR24\Model\ScoreModel;
 use PDO;
 
@@ -23,23 +23,28 @@ class ApiRouter {
 
     private function setupRoutes() {
         $doctorModel = new DoctorModel($this->pdo);
-        //$patientModel = new PatientModel($this->pdo);
+        $patientModel = new PatientModel($this->pdo);
         //$scoreModel = new ScoreModel($this->pdo);
         $errorController = new ErrorController();
 
-        $DoctorController = new DoctorController($doctorModel);
-        //$patientController = new PatientController($patientModel);
+        $doctorController = new DoctorController($doctorModel);
+        $patientController = new PatientController($patientModel);
         //$scoreController = new ScoreController($scoreModel);
 
         $this->router->setNamespace('\PR24\Controller');
 
-        $this->router->post('/api/register', function() use ($DoctorController) {
-            $response = $DoctorController->register();
+        $this->router->post('/api/register', function() use ($doctorController) {
+            $response = $doctorController->register();
             echo json_encode($response);
         });
         
-        $this->router->get('/api/activate/{userId}', function($userId) use ($DoctorController) {
-            $response = $DoctorController->activateUser($userId);
+        $this->router->get('/api/activate/{userId}', function($userId) use ($doctorController) {
+            $response = $doctorController->activateUser($userId);
+            echo json_encode($response);
+        });
+
+        $this->router->post('/api/patient', function() use ($patientController) {
+            $response = $patientController->createPatient();
             echo json_encode($response);
         });
 

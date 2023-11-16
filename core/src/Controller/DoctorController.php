@@ -45,14 +45,23 @@ class DoctorController {
     }
 
     public function activateUser($userId) {
+        // Check if the doctor is already activated
+        $isActivated = $this->doctorModel->isDoctorActivated($userId);
+        if ($isActivated === true) {
+            return ['status' => 'error', 'message' => 'Doctor already activated'];
+        } elseif ($isActivated === null) {
+            return ['status' => 'error', 'message' => 'Doctor not found'];
+        }
+    
         // Activate the doctor
         $result = $this->doctorModel->activateDoctor($userId);
         if ($result) {
-            return ['status' => 'success', 'message' => 'User activated'];
+            return ['status' => 'success', 'message' => 'Doctor activated'];
         } else {
             return ['status' => 'error', 'message' => 'Activation failed'];
         }
     }
+    
 
     private function validateRegistrationData($data) {
         // Basic validation logic

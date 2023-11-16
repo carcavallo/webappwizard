@@ -6,6 +6,7 @@ USE `webappwizard`;
 CREATE TABLE `admins` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -17,6 +18,7 @@ CREATE TABLE `doctors` (
   `vorname` VARCHAR(100) NOT NULL,
   `nachname` VARCHAR(100) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255),
   `arbeitsstelle_name` VARCHAR(255) DEFAULT NULL,
   `arbeitsstelle_adresse` VARCHAR(255) DEFAULT NULL,
   `arbeitsstelle_stadt` VARCHAR(100) DEFAULT NULL,

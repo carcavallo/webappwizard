@@ -37,8 +37,27 @@ class DoctorModel {
         }
     }
 
+    public function isDoctorActivated($doctorId) {
+        $sql = "SELECT activated FROM doctors WHERE id = :id";
+    
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $doctorId, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return (bool)$row['activated'];
+            } else {
+                return null;
+            }
+        } catch (PDOException $e) {
+            error_log('PDOException in isDoctorActivated: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
     public function activateDoctor($doctorId) {
-        $sql = "UPDATE doctors SET activated = 1 WHERE id = :id";
+        $sql = "UPDATE doctors SET activated = 1 WHERE id = :id AND activated = 0";
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -51,12 +70,11 @@ class DoctorModel {
                 return false;
             }
         } catch (PDOException $e) {
-            // Handle exception
             error_log('PDOException in activateDoctor: ' . $e->getMessage());
             return false;
         }
     }
-
+    /*
     public function getDoctorById($doctorId) {
         $sql = "SELECT * FROM doctors WHERE id = :id";
 
@@ -98,4 +116,5 @@ class DoctorModel {
             return false;
         }
     }
+    */
 }
