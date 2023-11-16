@@ -9,6 +9,8 @@ use PR24\Controller\ErrorController;
 use PR24\Model\DoctorModel;
 use PR24\Model\PatientModel;
 //use PR24\Model\ScoreModel;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use PDO;
 
 class ApiRouter {
@@ -70,26 +72,6 @@ class ApiRouter {
             $response = $patientController->createPatient();
             echo json_encode($response);
         });
-        
-
-        /*
-        $this->router->post('/api/patient/create', function() use ($patientController) {
-            $patientController->createPatient($_REQUEST);
-        });
-        */
-            
-        // Additional patient CRUD routes
-
-        // Score related routes
-        /*
-        $this->router->post('/api/score/calculate', function() use ($scoreController) {
-            $scoreController->calculateScore($_REQUEST);
-        });
-        */
-        // Additional score CRUD routes
-
-        // Error handling routes
-        //$this->router->set404($errorController->handleNotFound());
     }
 
     public function run() {

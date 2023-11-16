@@ -12,10 +12,14 @@ class DoctorModel {
     }
 
     public function createDoctor($doctorData) {
-        $hashedPassword = password_hash($doctorData['password'], PASSWORD_DEFAULT);
-        $doctorData['password'] = $hashedPassword;
+        if (isset($doctorData['password']) && !empty($doctorData['password'])) {
+            $hashedPassword = password_hash($doctorData['password'], PASSWORD_DEFAULT);
+            $doctorData['password'] = $hashedPassword;
+        } else {
+            $doctorData['password'] = NULL;
+        }
         
-        $sql = "INSERT INTO doctors (anrede, titel, vorname, nachname, email, arbeitsstelle_name, arbeitsstelle_adresse, arbeitsstelle_stadt, arbeitsstelle_plz, arbeitsstelle_land, taetigkeitsbereich, taetigkeitsbereich_sonstiges) VALUES (:anrede, :titel, :vorname, :nachname, :email, :arbeitsstelle_name, :arbeitsstelle_adresse, :arbeitsstelle_stadt, :arbeitsstelle_plz, :arbeitsstelle_land, :taetigkeitsbereich, :taetigkeitsbereich_sonstiges)";
+        $sql = "INSERT INTO doctors (anrede, titel, vorname, nachname, email, password, arbeitsstelle_name, arbeitsstelle_adresse, arbeitsstelle_stadt, arbeitsstelle_plz, arbeitsstelle_land, taetigkeitsbereich, taetigkeitsbereich_sonstiges) VALUES (:anrede, :titel, :vorname, :nachname, :email, :password, :arbeitsstelle_name, :arbeitsstelle_adresse, :arbeitsstelle_stadt, :arbeitsstelle_plz, :arbeitsstelle_land, :taetigkeitsbereich, :taetigkeitsbereich_sonstiges)";
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -25,6 +29,7 @@ class DoctorModel {
                 ':vorname' => $doctorData['vorname'],
                 ':nachname' => $doctorData['nachname'],
                 ':email' => $doctorData['email'],
+                ':password' => $doctorData['password'],
                 ':arbeitsstelle_name' => $doctorData['arbeitsstelle_name'],
                 ':arbeitsstelle_adresse' => $doctorData['arbeitsstelle_adresse'],
                 ':arbeitsstelle_stadt' => $doctorData['arbeitsstelle_stadt'],
@@ -59,24 +64,42 @@ class DoctorModel {
         }
     }
     
-    public function activateDoctor($doctorId) {
-        $sql = "UPDATE doctors SET activated = 1 WHERE id = :id AND activated = 0";
+    public function activateDoctorAndSetPassword($doctorId) {
+        $newPassword = $this->generateRandomPassword();
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $sql = "UPDATE doctors SET activated = 1, password = :password WHERE id = :id";
 
         try {
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $doctorId, PDO::PARAM_INT);
-            $stmt->execute();
+            $stmt->execute([':id' => $doctorId, ':password' => $hashedPassword]);
 
             if ($stmt->rowCount() > 0) {
-                return true;
+                return $newPassword;
             } else {
                 return false;
             }
         } catch (PDOException $e) {
-            error_log('PDOException in activateDoctor: ' . $e->getMessage());
+            // Handle exception
             return false;
         }
     }
+
+    private function generateRandomPassword($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomPassword = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomPassword .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomPassword;
+    }
+
+    public function getDoctorEmailById($doctorId) {
+        $stmt = $this->db->prepare("SELECT email FROM doctors WHERE id = :id");
+        $stmt->execute([':id' => $doctorId]);
+        return $stmt->fetchColumn();
+    }    
 
     public function validateCredentials($email, $password) {
         $stmt = $this->db->prepare("SELECT password FROM doctors WHERE email = :email");
@@ -88,47 +111,4 @@ class DoctorModel {
         }
         return false;
     }
-    /*
-    public function getDoctorById($doctorId) {
-        $sql = "SELECT * FROM doctors WHERE id = :id";
-
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $doctorId, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            // Handle exception
-            return false;
-        }
-    }
-
-    public function updateDoctor($doctorId, $doctorData) {
-        $sql = "UPDATE doctors SET anrede = :anrede, titel = :titel, vorname = :vorname, nachname = :nachname, email = :email, arbeitsstelle_name = :arbeitsstelle_name, arbeitsstelle_adresse = :arbeitsstelle_adresse, arbeitsstelle_stadt = :arbeitsstelle_stadt, arbeitsstelle_plz = :arbeitsstelle_plz, arbeitsstelle_land = :arbeitsstelle_land, taetigkeitsbereich = :taetigkeitsbereich, taetigkeitsbereich_sonstiges = :taetigkeitsbereich_sonstiges WHERE id = :id";
-
-        try {
-            $stmt = $this->db->prepare($sql);
-            $doctorData['id'] = $doctorId; // Add the ID to the doctorData array
-            $stmt->execute($doctorData);
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            // Handle exception
-            return false;
-        }
-    }
-
-    public function deleteDoctor($doctorId) {
-        $sql = "DELETE FROM doctors WHERE id = :id";
-
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $doctorId, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            // Handle exception
-            return false;
-        }
-    }
-    */
 }
