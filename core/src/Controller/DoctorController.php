@@ -4,6 +4,7 @@ namespace PR24\Controller;
 use PR24\Model\DoctorModel;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Firebase\JWT\JWT;
 
 class DoctorController {
     protected $doctorModel;
@@ -14,9 +15,20 @@ class DoctorController {
     
     public function authenticate() {
         $credentials = json_decode(file_get_contents('php://input'), true);
-
+    
         if ($this->doctorModel->validateCredentials($credentials['email'], $credentials['password'])) {
-            return ['status' => 'success', 'message' => 'Authorized'];
+            $token = [
+                "iss" => "http://localhost",
+                "iat" => time(),
+                "exp" => time() + 3600,
+                "data" => [
+                    "email" => $credentials['email']
+                ]
+            ];
+            
+            $jwt = JWT::encode($token, "4BPGK7keKm", 'HS256');
+    
+            return ['status' => 'success', 'message' => 'Authorized', 'token' => $jwt];
         } else {
             return ['status' => 'error', 'message' => 'Invalid credentials'];
         }
@@ -89,7 +101,7 @@ class DoctorController {
             $mail->CharSet = 'UTF-8';
 
             $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
-            $mail->addAddress('alessio.carcavallo@pr24.ch');
+            $mail->addAddress('alessiopirovino@gmail.com');
     
             $mail->isHTML(true);
             $mail->Subject = 'Flip-Flop-Score Anmeldung';

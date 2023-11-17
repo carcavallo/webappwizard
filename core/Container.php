@@ -19,7 +19,7 @@ class Container {
     private $services = [];
 
     public function __construct() {
-        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'kU7~51ft7`aQ');
+        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'toor');
         $this->initServices();
     }
 
@@ -40,6 +40,24 @@ class Container {
         $patientController = $this->get('PatientController');
         $scoreController = $this->get('ScoreController');
         $adminController = $this->get('AdminController');
+
+        $router->before('GET|POST|PUT|DELETE', '/(?!auth/register|auth/activate|auth/login|admin/login|admin/export).*', function() {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        
+            if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+                $token = $matches[1];
+        
+                $validationResult = JWTMiddleware::validateToken($token);
+        
+                if ($validationResult['status'] !== 'success') {
+                    Utils::sendJsonResponse(['status' => 'error', 'message' => $validationResult['message']]);
+                    exit();
+                }
+            } else {
+                Utils::sendJsonResponse(['status' => 'error', 'message' => 'Authorization header is not properly formatted.']);
+                exit();
+            }
+        });        
 
         $router->mount("/auth", function () use ($router, $doctorController) {
             $router->post("/login", function() use ($doctorController) {

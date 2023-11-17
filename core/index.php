@@ -14,6 +14,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . "/vendor/autoload.php";
 require_once __DIR__ . "/Utils.php";
 require_once __DIR__ . "/Container.php";
+require_once __DIR__ . "/JWTMiddleware.php";
 
 use Bramus\Router\Router;
 use PR24\Dependencies\Container;
