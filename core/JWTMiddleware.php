@@ -9,7 +9,7 @@ use Exception;
 class JWTMiddleware {
     public static function validateToken($token) {
         try {
-            $key = "4BPGK7keKm";
+            $key = $_ENV['SECRET_KEY'];
             $decoded = JWT::decode($token, new Key($key, 'HS256'));
             return ['status' => 'success', 'data' => $decoded->data];
         } catch (Exception $e) {

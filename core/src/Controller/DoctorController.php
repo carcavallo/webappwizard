@@ -18,7 +18,7 @@ class DoctorController {
     
         if ($this->doctorModel->validateCredentials($credentials['email'], $credentials['password'])) {
             $token = [
-                "iss" => "http://localhost",
+                "iss" => $_ENV['BASEDOMAIN'],
                 "iat" => time(),
                 "exp" => time() + 3600,
                 "data" => [
@@ -26,7 +26,7 @@ class DoctorController {
                 ]
             ];
             
-            $jwt = JWT::encode($token, "4BPGK7keKm", 'HS256');
+            $jwt = JWT::encode($token, $_ENV['SECRET_KEY'], 'HS256');
     
             return ['status' => 'success', 'message' => 'Authorized', 'token' => $jwt];
         } else {
@@ -92,16 +92,16 @@ class DoctorController {
         try {
             $mail->SMTPDebug = 0;
             $mail->isSMTP();
-            $mail->Host = 'asmtp.mail.hostpoint.ch';
+            $mail->Host = $_ENV['EMAIL_HOST'];
             $mail->SMTPAuth = true;
-            $mail->Username = 'sendmail@pr24.dev';
-            $mail->Password = 'SN262!9-1*G8Pj8uF2pP';
+            $mail->Username = $_ENV['EMAIL_USERNAME'];
+            $mail->Password = $_ENV['EMAIL_PASSWORD'];;
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
             $mail->CharSet = 'UTF-8';
 
-            $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
-            $mail->addAddress('alessiopirovino@gmail.com');
+            $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Registration');
+            $mail->addAddress($_ENV['EMAIL_TO']);
     
             $mail->isHTML(true);
             $mail->Subject = 'Flip-Flop-Score Anmeldung';
@@ -127,7 +127,7 @@ class DoctorController {
                 }
             }
     
-            $activateUrl = "http://localhost/api/auth/user/activate/" . $userId;
+            $activateUrl = $_ENV['BASEDOMAIN'] . "/api/auth/user/activate/" . $userId;
     
             $body .= "<br><a href='" . $activateUrl . "'>Benutzer freischalten und Zugang zusenden</a>";
     
@@ -148,14 +148,14 @@ class DoctorController {
         try {
             $mail->SMTPDebug = 0;
             $mail->isSMTP();
-            $mail->Host = 'asmtp.mail.hostpoint.ch';
+            $mail->Host = $_ENV['EMAIL_HOST'];
             $mail->SMTPAuth = true;
-            $mail->Username = 'sendmail@pr24.dev';
-            $mail->Password = 'SN262!9-1*G8Pj8uF2pP';
+            $mail->Username = $_ENV['EMAIL_USERNAME'];
+            $mail->Password = $_ENV['EMAIL_PASSWORD'];
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
     
-            $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
+            $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Registration');
             $mail->addAddress($email);
     
             $mail->isHTML(true);

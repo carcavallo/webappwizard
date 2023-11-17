@@ -20,7 +20,7 @@ class AdminController {
     
         if ($this->adminModel->authenticateAdmin($email, $password)) {
             $token = [
-                "iss" => "http://localhost",
+                "iss" => $_ENV['BASEDOMAIN'],
                 "iat" => time(),
                 "exp" => time() + 3600,
                 "data" => [
@@ -28,7 +28,7 @@ class AdminController {
                 ]
             ];
     
-            $jwt = JWT::encode($token, "4BPGK7keKm", 'HS256');
+            $jwt = JWT::encode($token, $_ENV['SECRET_KEY'], 'HS256');
     
             return ['success' => true, 'message' => 'Authorized', 'token' => $jwt];
         } else {

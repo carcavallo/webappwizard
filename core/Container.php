@@ -19,7 +19,7 @@ class Container {
     private $services = [];
 
     public function __construct() {
-        $this->pdo = new PDO('mysql:host=localhost;dbname=webappwizard', 'root', 'toor');
+        $this->pdo = new PDO('mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
         $this->initServices();
     }
 

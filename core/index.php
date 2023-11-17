@@ -19,6 +19,9 @@ require_once __DIR__ . "/JWTMiddleware.php";
 use Bramus\Router\Router;
 use PR24\Dependencies\Container;
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 $container = new Container();
 
 $router = new Router();
