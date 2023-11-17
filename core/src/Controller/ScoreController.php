@@ -58,7 +58,6 @@ class ScoreController {
         }
     }
     
-    
     public function deleteScore($scoreId) {
         $deleteResult = $this->scoreModel->deleteScoreRecord($scoreId);
         if ($deleteResult) {

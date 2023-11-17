@@ -47,7 +47,6 @@ class PatientController {
             'aktuelle_systemtherapie_sonstiges' => $request['aktuelle_systemtherapie_sonstiges'] ?? null,
             'jucken_letzte_24_stunden' => $request['jucken_letzte_24_stunden'] ?? null,
         ];
-
         return $patientData;
     }
 

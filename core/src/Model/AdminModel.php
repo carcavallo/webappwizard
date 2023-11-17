@@ -17,7 +17,6 @@ class AdminModel {
         if ($admin && password_verify($password, $admin['password'])) {
             return $admin;
         }
-
         return null;
     }
 
