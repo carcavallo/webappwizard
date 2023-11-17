@@ -1,11 +1,11 @@
-curl -X POST http://localhost/api/auth/register \
+curl -X POST http://localhost/api/auth/user/register \
      -H "Content-Type: application/json" \
      -d '{
          "anrede": "Herr",
          "titel": "Dr.",
          "vorname": "Alessio",
          "nachname": "Carcavallo",
-         "email": "alessio.carcavallo@pr24.ch",
+         "email": "alessiopirovino@gmail.com",
          "arbeitsstelle_name": "Klinikum Beverin",
          "arbeitsstelle_adresse": "Innerdorfstrasse 69",
          "arbeitsstelle_stadt": "Cazis",
@@ -15,18 +15,18 @@ curl -X POST http://localhost/api/auth/register \
          "taetigkeitsbereich_sonstiges": "Spezialisierung auf Dermatologie"
      }'
 
-curl -X GET http://localhost/api/auth/activate/1
+curl -X GET http://localhost/api/auth/user/activate/1
 
-curl -X POST http://localhost/api/auth/login \
+curl -X POST http://localhost/api/auth/user/login \
      -H "Content-Type: application/json" \
      -d '{
-         "email": "alessio.carcavallo@pr24.ch",
-         "password": "u3zYbsa4fR"
+         "email": "alessiopirovino@gmail.com",
+         "password": "ozs3auVB56"
      }'
 
 curl -X POST http://localhost/api/patient \
      -H "Content-Type: application/json" \
-     -H "Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDAyMTQ2MDYsImV4cCI6MTcwMDIxODIwNiwiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCJ9.Nv2wwTN51OsSglf9HnG2QN693B2oI33W6ctImjj8MR8" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYxNzU5LCJleHAiOjE3MDAyNjUzNTksImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.NFKA6cFgnCxOcrS_L-qjtJNaHkhcJk3OL36CvuS6vJ4" \
      -d '{
            "doctor_id": "1",
            "geburtsdatum": "2002-10-01",
@@ -43,10 +43,13 @@ curl -X POST http://localhost/api/patient \
          }'
 
 curl -X GET http://localhost/api/patient/1 \
-     -H "Content-Type: application/json"
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI"
+
 
 curl -X PUT http://localhost/api/patient/1 \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI" \
      -d '{
            "doctor_id": "1",
            "geburtsdatum": "2002-10-01",
@@ -63,40 +66,43 @@ curl -X PUT http://localhost/api/patient/1 \
          }'
 
 curl -X DELETE http://localhost/api/patient/1 \
-     -H "Content-Type: application/json"
-
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI"
 
 curl -X POST http://localhost/api/score \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI" \
      -d '{
-    "patient_id": 1,
-    "criteria_1": 1,
-    "criteria_2": 1,
-    "criteria_3": 1,
-    "criteria_4": 1,
-    "criteria_5": 1,
-    "criteria_6": 0,
-    "criteria_7": 1,
-    "criteria_8": 1,
-    "criteria_9": 1,
-    "criteria_10": 0,
-    "criteria_11": 1,
-    "criteria_12": 0,
-    "criteria_13": 1,
-    "criteria_14": 0,
-    "criteria_15": 1,
-    "criteria_16": 1,
-    "criteria_17": 1,
-    "criteria_18": 1,
-    "criteria_19": 1,
-    "criteria_20": 1
-}'
+           "patient_id": 1,
+           "criteria_1": 1,
+           "criteria_2": 1,
+           "criteria_3": 1,
+           "criteria_4": 1,
+           "criteria_5": 1,
+           "criteria_6": 0,
+           "criteria_7": 1,
+           "criteria_8": 1,
+           "criteria_9": 1,
+           "criteria_10": 0,
+           "criteria_11": 1,
+           "criteria_12": 0,
+           "criteria_13": 1,
+           "criteria_14": 0,
+           "criteria_15": 1,
+           "criteria_16": 1,
+           "criteria_17": 1,
+           "criteria_18": 1,
+           "criteria_19": 1,
+           "criteria_20": 1
+         }'
 
 curl -X GET http://localhost/api/scores/1 \
-     -H "Content-Type: application/json"
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI"
 
 curl -X PUT http://localhost/api/score/{scoreId} \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI"
      -d '{
         "criteria_1": 1,
         "criteria_2": 1,
@@ -122,8 +128,9 @@ curl -X PUT http://localhost/api/score/{scoreId} \
 
 curl -X DELETE http://localhost/api/score/1 \
      -H "Content-Type: application/json"
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMjYwNDkwLCJleHAiOjE3MDAyNjQwOTAsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.2vEf1nb25In6zP2Wp2MOc1Skv08BlDU8iXEVzYhM5hI"
 
-curl -X POST http://localhost/api/admin/login \
+curl -X POST http://localhost/api/auth/admin/login \
      -H "Content-Type: application/json" \
      -d '{
          "email": "admin@example.com",

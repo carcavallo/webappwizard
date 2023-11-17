@@ -127,7 +127,7 @@ class DoctorController {
                 }
             }
     
-            $activateUrl = "http://localhost/api/auth/activate/" . $userId;
+            $activateUrl = "http://localhost/api/auth/user/activate/" . $userId;
     
             $body .= "<br><a href='" . $activateUrl . "'>Benutzer freischalten und Zugang zusenden</a>";
     

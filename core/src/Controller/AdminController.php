@@ -2,6 +2,7 @@
 namespace PR24\Controller;
 
 use PR24\Model\AdminModel;
+use Firebase\JWT\JWT;
 
 class AdminController {
     protected $adminModel;
@@ -13,17 +14,26 @@ class AdminController {
     public function authenticate() {
         $input = file_get_contents('php://input');
         $data = json_decode($input, true);
-
+    
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
-
-        $admin = $this->adminModel->authenticateAdmin($email, $password);
-
-        if ($admin) {
-            return ['success' => true, 'message' => 'Authentication successful'];
+    
+        if ($this->adminModel->authenticateAdmin($email, $password)) {
+            $token = [
+                "iss" => "http://localhost",
+                "iat" => time(),
+                "exp" => time() + 3600,
+                "data" => [
+                    "email" => $email
+                ]
+            ];
+    
+            $jwt = JWT::encode($token, "4BPGK7keKm", 'HS256');
+    
+            return ['success' => true, 'message' => 'Authorized', 'token' => $jwt];
+        } else {
+            return ['success' => false, 'message' => 'Invalid credentials'];
         }
-
-        return ['success' => false, 'message' => 'Authentication failed'];
     }
 
     public function exportPatientData() {

@@ -41,7 +41,7 @@ class Container {
         $scoreController = $this->get('ScoreController');
         $adminController = $this->get('AdminController');
 
-        $router->before('GET|POST|PUT|DELETE', '/(?!auth/register|auth/activate|auth/login|admin/login|admin/export).*', function() {
+        $router->before('GET|POST|PUT|DELETE', '/(?!auth/user/register|auth/user/activate|auth/user/login|auth/admin/login).*', function() {
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         
             if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
@@ -54,23 +54,23 @@ class Container {
                     exit();
                 }
             } else {
-                Utils::sendJsonResponse(['status' => 'error', 'message' => 'Authorization header is not properly formatted.']);
+                Utils::sendJsonResponse(['status' => 'error', 'message' => 'Unauthorized']);
                 exit();
             }
         });        
 
         $router->mount("/auth", function () use ($router, $doctorController) {
-            $router->post("/login", function() use ($doctorController) {
+            $router->post("/user/login", function() use ($doctorController) {
                 $response = $doctorController->authenticate();
                 Utils::sendJsonResponse($response);
             });
 
-            $router->post("/register", function() use ($doctorController) {
+            $router->post("/user/register", function() use ($doctorController) {
                 $response = $doctorController->register();
                 Utils::sendJsonResponse($response);
             });
 
-            $router->get("/activate/{userId}", function($userId) use ($doctorController) {
+            $router->get("/user/activate/{userId}", function($userId) use ($doctorController) {
                 $response = $doctorController->activateUser($userId);
                 Utils::sendJsonResponse($response);
             });
@@ -117,7 +117,7 @@ class Container {
             Utils::sendJsonResponse($response);
         });
         
-        $router->post("/admin/login", function() use ($adminController) {
+        $router->post("/auth/admin/login", function() use ($adminController) {
             $response = $adminController->authenticate();
             Utils::sendJsonResponse($response);
         });
