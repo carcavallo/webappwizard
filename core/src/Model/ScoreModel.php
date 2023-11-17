@@ -80,12 +80,10 @@ class ScoreModel {
 
     public function updateScoreRecord($scoreId, $data) {
         try {
-            // Extract criteria data from $data, excluding 'totalScore'
             $criteriaData = array_filter($data, function($key) {
                 return strpos($key, 'criteria_') === 0;
             }, ARRAY_FILTER_USE_KEY);
     
-            // Update the criteria in the database
             $parameters = [':id' => $scoreId];
             $criteriaSet = [];
             foreach ($criteriaData as $key => $value) {
@@ -97,10 +95,8 @@ class ScoreModel {
             $stmt = $this->db->prepare($sql);
             $stmt->execute($parameters);
     
-            // Recalculate the total score based on the updated criteria
             $totalScore = $this->calculateScore($criteriaData);
     
-            // Update the total score in the database
             $sql = "UPDATE patient_scores SET total_score = :total_score WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':total_score' => $totalScore, ':id' => $scoreId]);

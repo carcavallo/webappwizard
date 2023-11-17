@@ -107,6 +107,7 @@ CREATE TABLE `patient_scores` (
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+/*
 -- Insert sample data into doctors
 INSERT INTO `doctors` (`anrede`, `titel`, `vorname`, `nachname`, `email`, `arbeitsstelle_name`, `arbeitsstelle_adresse`, `arbeitsstelle_stadt`, `arbeitsstelle_plz`, `arbeitsstelle_land`, `taetigkeitsbereich`, `taetigkeitsbereich_sonstiges`) 
 VALUES ('Herr', 'Dr.', 'Max', 'Mustermann', 'max.mustermann@email.com', 'Klinikum Beispielstadt', 'Musterstrasse 1', 'Beispielstadt', '12345', 'Deutschland', 'Patientenversorgung', NULL),
@@ -134,3 +135,4 @@ INSERT INTO `patient_scores` (`patient_id`, `criteria_1`, `criteria_2`, `criteri
 VALUES 
 (1, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, -1.21),
 (2, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, 2.34);
+*/
