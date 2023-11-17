@@ -35,7 +35,6 @@ class DoctorController {
     }
 
     public function register() {
-
         $requestBody = json_decode(file_get_contents('php://input'), true);
 
         $registrationData = [
@@ -59,6 +58,7 @@ class DoctorController {
 
         $doctorId = $this->doctorModel->createDoctor($registrationData);
         if ($doctorId) {
+            $this->sendRegistrationConfirmationEmail($registrationData, $doctorId);
             return ['status' => 'success', 'message' => 'Registration successful', 'doctorId' => $doctorId];
         } else {
             return ['status' => 'error', 'message' => 'Registration failed'];
@@ -86,6 +86,43 @@ class DoctorController {
         }
     }
     
+    private function sendRegistrationConfirmationEmail($registrationData, $userId) {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->SMTPDebug = 0;
+            $mail->isSMTP();
+            $mail->Host = 'asmtp.mail.hostpoint.ch';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'sendmail@pr24.dev';
+            $mail->Password = 'SN262!9-1*G8Pj8uF2pP';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
+    
+            $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
+            $mail->addAddress('alessio.carcavallo@pr24.ch');
+
+            $mail->isHTML(true);
+            $mail->Subject = 'Flip-Flop-Score Anmeldung';
+            $body = "Es gibt eine neue Anmeldung von " . htmlspecialchars($registrationData['vorname']) . " " . htmlspecialchars($registrationData['nachname']) . ".<br>Die folgenden Daten wurden eingetragen:<br>";
+            foreach ($registrationData as $key => $value) {
+                $body .= htmlspecialchars(ucfirst($key) . ": " . $value) . "<br>";
+            }
+
+            $activateUrl = "http://localhost/api/auth/activate/" . $userId;
+            $body .= "<br><a href='" . $activateUrl . "' style='padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;'>Benutzer freischalten und Zugang zusenden</a>";
+
+            $mail->Body = $body;
+            $mail->AltBody = strip_tags(str_replace("<br>", "\n", $body));
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
+            return false;
+        }
+    }
+
     private function sendPasswordEmail($email, $password) {
         $mail = new PHPMailer(true);
     
@@ -113,7 +150,7 @@ class DoctorController {
             error_log('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
             return false;
         }
-    }    
+    }
     
     private function validateRegistrationData($data) {
         return filter_var($data['email'], FILTER_VALIDATE_EMAIL) && !empty($data['vorname']) && !empty($data['nachname']);
