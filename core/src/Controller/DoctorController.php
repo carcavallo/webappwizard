@@ -13,7 +13,7 @@ class DoctorController {
     public function __construct(DoctorModel $doctorModel) {
         $this->doctorModel = $doctorModel;
     }
-
+    
     public function authenticate() {
         $credentials = json_decode(file_get_contents('php://input'), true);
 
@@ -38,7 +38,6 @@ class DoctorController {
 
         $requestBody = json_decode(file_get_contents('php://input'), true);
 
-        // Extract data from the decoded JSON
         $registrationData = [
             'anrede' => $requestBody['anrede'] ?? null,
             'titel' => $requestBody['titel'] ?? null,
@@ -54,12 +53,10 @@ class DoctorController {
             'taetigkeitsbereich_sonstiges' => $requestBody['taetigkeitsbereich_sonstiges'] ?? null
         ];
         
-        // Data validation
         if (!$this->validateRegistrationData($registrationData)) {
             return ['status' => 'error', 'message' => 'Invalid registration data'];
         }
 
-        // Create doctor in database
         $doctorId = $this->doctorModel->createDoctor($registrationData);
         if ($doctorId) {
             return ['status' => 'success', 'message' => 'Registration successful', 'doctorId' => $doctorId];
@@ -69,7 +66,6 @@ class DoctorController {
     }
 
     public function activateUser($userId) {
-        // Check if the doctor is already activated
         $isActivated = $this->doctorModel->isDoctorActivated($userId);
         if ($isActivated === true) {
             return ['status' => 'error', 'message' => 'Doctor already activated'];
@@ -77,10 +73,8 @@ class DoctorController {
             return ['status' => 'error', 'message' => 'Doctor not found'];
         }
     
-        // Activate the doctor and set a new password
         $newPassword = $this->doctorModel->activateDoctorAndSetPassword($userId);
         if ($newPassword) {
-            // Retrieve doctor's email to send the password
             $doctorEmail = $this->doctorModel->getDoctorEmailById($userId);
             if ($this->sendPasswordEmail($doctorEmail, $newPassword)) {
                 return ['status' => 'success', 'message' => 'Doctor activated and password sent'];
@@ -96,22 +90,19 @@ class DoctorController {
         $mail = new PHPMailer(true);
     
         try {
-            // Server settings
-            $mail->SMTPDebug = 0; // Enable verbose debug output
-            $mail->isSMTP(); // Set mailer to use SMTP
-            $mail->Host = 'asmtp.mail.hostpoint.ch'; // Specify main and backup SMTP servers
-            $mail->SMTPAuth = true; // Enable SMTP authentication
-            $mail->Username = 'sendmail@pr24.dev'; // SMTP username
-            $mail->Password = 'SN262!9-1*G8Pj8uF2pP'; // SMTP password
-            $mail->SMTPSecure = 'tls'; // Enable TLS encryption, `ssl` also accepted
-            $mail->Port = 587; // TCP port to connect to
+            $mail->SMTPDebug = 0;
+            $mail->isSMTP();
+            $mail->Host = 'asmtp.mail.hostpoint.ch';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'sendmail@pr24.dev';
+            $mail->Password = 'SN262!9-1*G8Pj8uF2pP';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
     
-            // Recipients
             $mail->setFrom('sendmail@pr24.dev', 'Mailer');
-            $mail->addAddress($email); // Add a recipient
+            $mail->addAddress($email);
     
-            // Content
-            $mail->isHTML(true); // Set email format to HTML
+            $mail->isHTML(true);
             $mail->Subject = 'Your Account Activation';
             $mail->Body    = 'Your account has been activated.<br>Your new password: ' . $password;
             $mail->AltBody = 'Your account has been activated. Your new password: ' . $password;
@@ -125,7 +116,6 @@ class DoctorController {
     }    
     
     private function validateRegistrationData($data) {
-        // Basic validation logic
         return filter_var($data['email'], FILTER_VALIDATE_EMAIL) && !empty($data['vorname']) && !empty($data['nachname']);
     }
 }

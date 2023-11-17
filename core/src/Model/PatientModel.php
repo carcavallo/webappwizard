@@ -23,49 +23,4 @@ class PatientModel {
             return false;
         }
     }
-    /*
-    public function getPatientById($patientId) {
-        $sql = "SELECT * FROM patients WHERE id = :id";
-
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $patientId, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            // Log error or handle exception
-            return false;
-        }
-    }
-
-    public function updatePatient($patientId, $patientData) {
-        $sql = "UPDATE patients SET patient_id = :patient_id, doctor_id = :doctor_id, geburtsdatum = :geburtsdatum, geschlecht = :geschlecht, ethnie = :ethnie, vermutete_diagnose = :vermutete_diagnose, histopathologische_untersuchung = :histopathologische_untersuchung, histopathologie_ergebnis = :histopathologie_ergebnis, bisherige_lokaltherapie_sonstiges = :bisherige_lokaltherapie_sonstiges, bisherige_systemtherapie_sonstiges = :bisherige_systemtherapie_sonstiges, aktuelle_lokaltherapie_sonstiges = :aktuelle_lokaltherapie_sonstiges, aktuelle_systemtherapie_sonstiges = :aktuelle_systemtherapie_sonstiges, jucken_letzte_24_stunden = :jucken_letzte_24_stunden WHERE id = :id";
-    
-        try {
-            $stmt = $this->db->prepare($sql);
-            $patientData['id'] = $patientId; // Ensure 'id' is included in the data array
-            $stmt->execute($patientData);
-            return $stmt->rowCount(); // Returns the number of affected rows
-        } catch (PDOException $e) {
-            // Log error or handle exception
-            return false;
-        }
-    }
-    
-
-    public function deletePatient($patientId) {
-        $sql = "DELETE FROM patients WHERE id = :id";
-    
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $patientId, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->rowCount(); // Returns the number of affected rows
-        } catch (PDOException $e) {
-            // Log error or handle exception
-            return false;
-        }
-    }
-    */
-
 }

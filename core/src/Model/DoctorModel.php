@@ -40,7 +40,7 @@ class DoctorModel {
             ]);
             return $this->db->lastInsertId();
         } catch (PDOException $e) {
-            // Handle exception
+            error_log('PDOException in createDoctor: ' . $e->getMessage());
             return false;
         }
     }
@@ -80,7 +80,7 @@ class DoctorModel {
                 return false;
             }
         } catch (PDOException $e) {
-            // Handle exception
+            error_log('PDOException in activateDoctorAndSetPassword: ' . $e->getMessage());
             return false;
         }
     }

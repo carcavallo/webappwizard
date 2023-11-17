@@ -12,15 +12,12 @@ class PatientController {
 
     public function createPatient() {
         $request = json_decode(file_get_contents('php://input'), true);
-        // Prepare patient data with generated patient_id
         $patientData = $this->preparePatientData($request);
 
-        // Validate data before proceeding
         if (!$this->validatePatientData($patientData)) {
             return ['status' => 'error', 'message' => 'Invalid patient data'];
         }
 
-        // Create patient in the database
         $patientId = $this->patientModel->createPatient($patientData);
         if ($patientId) {
             return ['status' => 'success', 'message' => 'Patient creation successful', 'patientId' => $patientId];
@@ -55,9 +52,6 @@ class PatientController {
     }
 
     private function validatePatientData($data) {
-        // Basic validation: Ensure mandatory fields are present
         return !empty($data['doctor_id']) && !empty($data['geburtsdatum']) && !empty($data['geschlecht']);
     }
-
-    // Additional CRUD methods for patient management
 }
