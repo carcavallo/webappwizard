@@ -2,8 +2,6 @@
 namespace PR24\Controller;
 
 use PR24\Model\DoctorModel;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -18,17 +16,7 @@ class DoctorController {
         $credentials = json_decode(file_get_contents('php://input'), true);
 
         if ($this->doctorModel->validateCredentials($credentials['email'], $credentials['password'])) {
-            $issuedAt = time();
-            $expirationTime = $issuedAt + 3600;
-            $payload = [
-                'iat' => $issuedAt,
-                'exp' => $expirationTime,
-                'email' => $credentials['email']
-            ];
-
-            $jwt = JWT::encode($payload, 'BhPGQGyPuIkRz+hzMlfCsgaFNjKPSYgFjX73+LPf5k4=', 'HS256');
-
-            return ['status' => 'success', 'token' => $jwt];
+            return ['status' => 'success', 'message' => 'Authorized'];
         } else {
             return ['status' => 'error', 'message' => 'Invalid credentials'];
         }
@@ -98,23 +86,42 @@ class DoctorController {
             $mail->Password = 'SN262!9-1*G8Pj8uF2pP';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
-    
+            $mail->CharSet = 'UTF-8';
+
             $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
             $mail->addAddress('alessio.carcavallo@pr24.ch');
-
+    
             $mail->isHTML(true);
             $mail->Subject = 'Flip-Flop-Score Anmeldung';
-            $body = "Es gibt eine neue Anmeldung von " . htmlspecialchars($registrationData['vorname']) . " " . htmlspecialchars($registrationData['nachname']) . ".<br>Die folgenden Daten wurden eingetragen:<br>";
+    
+            $body = "Es gibt eine neue Anmeldung von " . htmlspecialchars($registrationData['anrede']) . " " . htmlspecialchars($registrationData['titel']) . " " . htmlspecialchars($registrationData['vorname']) . " " . htmlspecialchars($registrationData['nachname']) . ".<br/><br>Die folgenden Daten wurden eingetragen:<br>";
+            $keyMap = [
+                'email' => 'E-Mail',
+                'arbeitsstelle_name' => 'Arbeitsstelle Name',
+                'arbeitsstelle_adresse' => 'Arbeitsstelle Adresse',
+                'arbeitsstelle_stadt' => 'Arbeitsstelle Stadt',
+                'arbeitsstelle_plz' => 'Arbeitsstelle PLZ',
+                'arbeitsstelle_land' => 'Arbeitsstelle Land',
+                'taetigkeitsbereich' => 'Tätigkeitsbereich',
+                'taetigkeitsbereich_sonstiges' => 'Tätigkeitsbereich Sonstiges'
+            ];
+    
+            $fieldsToSkip = ['anrede', 'titel', 'vorname', 'nachname'];
+
             foreach ($registrationData as $key => $value) {
-                $body .= htmlspecialchars(ucfirst($key) . ": " . $value) . "<br>";
+                if (!in_array($key, $fieldsToSkip)) {
+                    $displayName = $keyMap[$key] ?? ucfirst($key);
+                    $body .= htmlspecialchars($displayName . ": " . $value) . "<br>";
+                }
             }
-
+    
             $activateUrl = "http://localhost/api/auth/activate/" . $userId;
-            $body .= "<br><a href='" . $activateUrl . "' style='padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;'>Benutzer freischalten und Zugang zusenden</a>";
-
+    
+            $body .= "<br><a href='" . $activateUrl . "'>Benutzer freischalten und Zugang zusenden</a>";
+    
             $mail->Body = $body;
             $mail->AltBody = strip_tags(str_replace("<br>", "\n", $body));
-
+    
             $mail->send();
             return true;
         } catch (Exception $e) {
@@ -136,13 +143,13 @@ class DoctorController {
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
     
-            $mail->setFrom('sendmail@pr24.dev', 'Mailer');
+            $mail->setFrom('sendmail@pr24.dev', 'CK-Care Registration');
             $mail->addAddress($email);
     
             $mail->isHTML(true);
-            $mail->Subject = 'Your Account Activation';
-            $mail->Body    = 'Your account has been activated.<br>Your new password: ' . $password;
-            $mail->AltBody = 'Your account has been activated. Your new password: ' . $password;
+            $mail->Subject = 'Ihre Flip-Flop-Score Anmeldung';
+            $mail->Body    = 'Ihr Konto wurde aktiviert.<br>Ihr Benutzername: ' . htmlspecialchars($email) . '<br>Ihr Passwort: ' . htmlspecialchars($password);
+            $mail->AltBody = 'Ihr Konto wurde aktiviert. Ihr Benutzername: ' . htmlspecialchars($email) . '. Ihr Passwort: ' . htmlspecialchars($password);
     
             $mail->send();
             return true;

@@ -51,6 +51,38 @@ class PatientController {
         return $patientData;
     }
 
+    public function readPatient($patientId) {
+        $patientData = $this->patientModel->getPatientById($patientId);
+        if ($patientData) {
+            return ['status' => 'success', 'patientData' => $patientData];
+        } else {
+            return ['status' => 'error', 'message' => 'Patient not found'];
+        }
+    }
+
+    public function updatePatient($patientId) {
+        $request = json_decode(file_get_contents('php://input'), true);
+        $patientData = $this->preparePatientData($request);
+
+        if (!$this->validatePatientData($patientData)) {
+            return ['status' => 'error', 'message' => 'Invalid patient data'];
+        }
+
+        if ($this->patientModel->updatePatient($patientId, $patientData)) {
+            return ['status' => 'success', 'message' => 'Patient update successful'];
+        } else {
+            return ['status' => 'error', 'message' => 'Patient update failed'];
+        }
+    }
+
+    public function deletePatient($patientId) {
+        if ($this->patientModel->deletePatient($patientId)) {
+            return ['status' => 'success', 'message' => 'Patient deletion successful'];
+        } else {
+            return ['status' => 'error', 'message' => 'Patient deletion failed'];
+        }
+    }
+
     private function validatePatientData($data) {
         return !empty($data['doctor_id']) && !empty($data['geburtsdatum']) && !empty($data['geschlecht']);
     }

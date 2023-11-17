@@ -65,4 +65,63 @@ class ScoreModel {
             return false;
         }
     }
+
+    public function getScoresByPatientId($patientId) {
+        try {
+            $sql = "SELECT * FROM patient_scores WHERE patient_id = :patient_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':patient_id' => $patientId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("PDOException in getScoresByPatientId: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function updateScoreRecord($scoreId, $data) {
+        try {
+            // Extract criteria data from $data, excluding 'totalScore'
+            $criteriaData = array_filter($data, function($key) {
+                return strpos($key, 'criteria_') === 0;
+            }, ARRAY_FILTER_USE_KEY);
+    
+            // Update the criteria in the database
+            $parameters = [':id' => $scoreId];
+            $criteriaSet = [];
+            foreach ($criteriaData as $key => $value) {
+                $criteriaSet[] = "$key = :$key";
+                $parameters[":$key"] = $value ? 1 : 0;
+            }
+            $criteriaSetString = implode(', ', $criteriaSet);
+            $sql = "UPDATE patient_scores SET $criteriaSetString WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($parameters);
+    
+            // Recalculate the total score based on the updated criteria
+            $totalScore = $this->calculateScore($criteriaData);
+    
+            // Update the total score in the database
+            $sql = "UPDATE patient_scores SET total_score = :total_score WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':total_score' => $totalScore, ':id' => $scoreId]);
+    
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("PDOException in updateScoreRecord: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+
+    public function deleteScoreRecord($scoreId) {
+        try {
+            $sql = "DELETE FROM patient_scores WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $scoreId]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("PDOException in deleteScoreRecord: " . $e->getMessage());
+            return false;
+        }
+    }    
 }

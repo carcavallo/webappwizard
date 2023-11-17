@@ -63,8 +63,39 @@ class Container {
             Utils::sendJsonResponse($response);
         });
 
-        $router->post("/score/calculate", function() use ($scoreController) {
-            $response = $scoreController->calculateAndSaveScore();
+        $router->get("/patient/{patientId}", function($patientId) use ($patientController) {
+            $response = $patientController->readPatient($patientId);
+            Utils::sendJsonResponse($response);
+        });
+        
+        $router->put("/patient/{patientId}", function($patientId) use ($patientController) {
+            $response = $patientController->updatePatient($patientId);
+            Utils::sendJsonResponse($response);
+        });
+        
+        $router->delete("/patient/{patientId}", function($patientId) use ($patientController) {
+            $response = $patientController->deletePatient($patientId);
+            Utils::sendJsonResponse($response);
+        });
+
+        $router->post("/score", function() use ($scoreController) {
+            $response = $scoreController->createScore();
+            Utils::sendJsonResponse($response);
+        });
+
+        $router->get('/scores/{patientId}', function($patientId) use ($scoreController) {
+            $response = $scoreController->getScores($patientId);
+            Utils::sendJsonResponse($response);
+        });
+            
+        $router->put('/score/{scoreId}', function($scoreId) use ($scoreController) {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $response = $scoreController->updateScore($scoreId, $data['criteria'], $data['totalScore']);
+            Utils::sendJsonResponse($response);
+        });
+    
+        $router->delete('/score/{scoreId}', function($scoreId) use ($scoreController) {
+            $response = $scoreController->deleteScore($scoreId);
             Utils::sendJsonResponse($response);
         });
         
@@ -73,7 +104,7 @@ class Container {
             Utils::sendJsonResponse($response);
         });
 
-        $router->get("/admin/export-patients", function() use ($adminController) {
+        $router->get("/admin/export", function() use ($adminController) {
             $adminController->exportPatientData();
         });
     }

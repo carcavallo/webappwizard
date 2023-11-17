@@ -1,8 +1,6 @@
 {
     "require": {
         "bramus/router": "^1.6",
-        "monolog/monolog": "^3.5",
-        "firebase/php-jwt": "^6.9",
         "phpmailer/phpmailer": "^6.8"
     },
     "autoload": {

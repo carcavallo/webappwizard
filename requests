@@ -42,7 +42,31 @@ curl -X POST http://localhost/api/patient \
            "jucken_letzte_24_stunden": 1
          }'
 
-curl -X POST http://localhost/api/score/calculate \
+curl -X GET http://localhost/api/patient/1 \
+     -H "Content-Type: application/json"
+
+curl -X PUT http://localhost/api/patient/1 \
+     -H "Content-Type: application/json" \
+     -d '{
+           "doctor_id": "1",
+           "geburtsdatum": "2002-01-01",
+           "geschlecht": "Weiblich",
+           "ethnie": "Ethnie",
+           "vermutete_diagnose": "AD",
+           "histopathologische_untersuchung": "Ja",
+           "histopathologie_ergebnis": "Ergebnis",
+           "bisherige_lokaltherapie_sonstiges": "Lokaltherapie",
+           "bisherige_systemtherapie_sonstiges": "Systemtherapie",
+           "aktuelle_lokaltherapie_sonstiges": "Aktuelle Lokaltherapie",
+           "aktuelle_systemtherapie_sonstiges": "Aktuelle Systemtherapie",
+           "jucken_letzte_24_stunden": 1
+         }'
+
+curl -X DELETE http://localhost/api/patient/1 \
+     -H "Content-Type: application/json"
+
+
+curl -X POST http://localhost/api/score \
      -H "Content-Type: application/json" \
      -d '{
     "patient_id": 1,
@@ -66,7 +90,39 @@ curl -X POST http://localhost/api/score/calculate \
     "criteria_18": 1,
     "criteria_19": 1,
     "criteria_20": 1
-}
+}'
+
+curl -X GET http://localhost/api/scores/{patientId} \
+     -H "Content-Type: application/json"
+
+// DOESN'T WORK 17.11
+curl -X PUT http://localhost/api/score/{scoreId} \
+     -H "Content-Type: application/json" \
+     -d '{
+        "criteria_1": 1,
+        "criteria_2": 1,
+        "criteria_3": 1,
+        "criteria_4": 1,
+        "criteria_5": 1,
+        "criteria_6": 0,
+        "criteria_7": 1,
+        "criteria_8": 1,
+        "criteria_9": 1,
+        "criteria_10": 0,
+        "criteria_11": 1,
+        "criteria_12": 0,
+        "criteria_13": 1,
+        "criteria_14": 0,
+        "criteria_15": 1,
+        "criteria_16": 1,
+        "criteria_17": 1,
+        "criteria_18": 1,
+        "criteria_19": 1,
+        "criteria_20": 1
+}'
+
+curl -X DELETE http://localhost/api/score/{scoreId} \
+     -H "Content-Type: application/json"
 
 curl -X POST http://localhost/api/admin/login \
      -H "Content-Type: application/json" \
@@ -74,3 +130,5 @@ curl -X POST http://localhost/api/admin/login \
          "email": "admin@example.com",
          "password": "toor"
      }'
+
+curl -X GET http://localhost/api/admin/export -o patienten_daten.csv
