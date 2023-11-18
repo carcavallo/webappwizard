@@ -47,24 +47,35 @@ class ScoreModel {
     }
 
     public function insertNewScoreRecord($patientId, $criteria, $totalScore) {
-        $sql = "INSERT INTO patient_scores (patient_id, criteria_1, criteria_2, criteria_3, criteria_4, criteria_5, criteria_6, criteria_7, criteria_8, criteria_9, criteria_10, criteria_11, criteria_12, criteria_13, criteria_14, criteria_15, criteria_16, criteria_17, criteria_18, criteria_19, criteria_20, total_score)
-                VALUES (:patient_id, :criteria_1, :criteria_2, :criteria_3, :criteria_4, :criteria_5, :criteria_6, :criteria_7, :criteria_8, :criteria_9, :criteria_10, :criteria_11, :criteria_12, :criteria_13, :criteria_14, :criteria_15, :criteria_16, :criteria_17, :criteria_18, :criteria_19, :criteria_20, :total_score)";
-        try {
-            $defaultCriteria = array_fill_keys(array_map(function($i) { return 'criteria_' . $i; }, range(1, 20)), false);
-            foreach ($criteria as $key => $value) {
+        $allCriteriaSet = true;
+    
+        $defaultCriteria = array_fill_keys(array_map(function($i) { return 'criteria_' . $i; }, range(1, 20)), NULL);
+        foreach ($criteria as $key => $value) {
+            if (is_null($value)) {
+                $allCriteriaSet = false;
+                $defaultCriteria[$key] = NULL;
+            } else {
                 $defaultCriteria[$key] = $value ? 1 : 0;
             }
-            $parameters = array_merge([':patient_id' => $patientId, ':total_score' => $totalScore], $defaultCriteria);
+        }
+    
+        $saved = $allCriteriaSet ? 1 : 0;
+    
+        $sql = "INSERT INTO patient_scores (patient_id, criteria_1, criteria_2, criteria_3, criteria_4, criteria_5, criteria_6, criteria_7, criteria_8, criteria_9, criteria_10, criteria_11, criteria_12, criteria_13, criteria_14, criteria_15, criteria_16, criteria_17, criteria_18, criteria_19, criteria_20, total_score, saved)
+                VALUES (:patient_id, :criteria_1, :criteria_2, :criteria_3, :criteria_4, :criteria_5, :criteria_6, :criteria_7, :criteria_8, :criteria_9, :criteria_10, :criteria_11, :criteria_12, :criteria_13, :criteria_14, :criteria_15, :criteria_16, :criteria_17, :criteria_18, :criteria_19, :criteria_20, :total_score, :saved)";
+    
+        $parameters = array_merge([':patient_id' => $patientId, ':total_score' => $totalScore, ':saved' => $saved], $defaultCriteria);
+        
+        try {
             $stmt = $this->db->prepare($sql);
             $stmt->execute($parameters);
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("PDOException in insertNewScoreRecord: " . $e->getMessage());
-            error_log("SQL Query: " . $sql);
-            error_log("Query Parameters: " . print_r($parameters, true));
             return false;
         }
     }
+    
 
     public function getScoresByPatientId($patientId) {
         try {
@@ -79,32 +90,46 @@ class ScoreModel {
     }
 
     public function updateScoreRecord($scoreId, $data) {
-        try {
-            $criteriaData = array_filter($data, function($key) {
-                return strpos($key, 'criteria_') === 0;
-            }, ARRAY_FILTER_USE_KEY);
+        $criteriaData = array_filter($data, function($key) {
+            return strpos($key, 'criteria_') === 0;
+        }, ARRAY_FILTER_USE_KEY);
     
-            $parameters = [':id' => $scoreId];
-            $criteriaSet = [];
-            foreach ($criteriaData as $key => $value) {
-                $criteriaSet[] = "$key = :$key";
-                $parameters[":$key"] = $value ? 1 : 0;
+        $allCriteriaSet = true;
+        foreach ($criteriaData as $key => &$value) {
+            if (isset($value) && in_array($value, [0, 1])) {
+                $value = (bool)$value;
+            } else {
+                $allCriteriaSet = false;
+                $value = false;
             }
+        }
     
-            $totalScore = $this->calculateScore($criteriaData);
-            $parameters[':total_score'] = $totalScore;
+        $parameters = [':id' => $scoreId];
+        $criteriaSet = [];
+        foreach ($criteriaData as $key => $value) {
+            $criteriaSet[] = "$key = :$key";
+            $parameters[":$key"] = $value ? 1 : 0;
+        }
     
-            $criteriaSetString = implode(', ', $criteriaSet);
-            $sql = "UPDATE patient_scores SET $criteriaSetString, total_score = :total_score WHERE id = :id";
+        $totalScore = $this->calculateScore($criteriaData);
+        $parameters[':total_score'] = $totalScore;
+        $saved = $allCriteriaSet ? 1 : 0;
+        $parameters[':saved'] = $saved;
+    
+        $criteriaSetString = implode(', ', $criteriaSet);
+        $sql = "UPDATE patient_scores SET $criteriaSetString, total_score = :total_score, saved = :saved WHERE id = :id";
+    
+        try {
             $stmt = $this->db->prepare($sql);
             $stmt->execute($parameters);
-    
+        
             return true;
         } catch (PDOException $e) {
             error_log("PDOException in updateScoreRecord: " . $e->getMessage());
             return false;
         }
     }
+    
      
     public function deleteScoreRecord($scoreId) {
         try {

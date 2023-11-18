@@ -71,7 +71,7 @@ curl -X DELETE http://localhost/api/patient/1 \
 
 curl -X POST http://localhost/api/score \
      -H "Content-Type: application/json" \
-     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMzAzMDI0LCJleHAiOjE3MDAzMDY2MjQsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.w0QybiXZjZsO7ZdH85uukPhfzGPvY872X0K9ELqulbo" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwMzQwMzk3LCJleHAiOjE3MDAzNDM5OTcsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvcGlyb3Zpbm9AZ21haWwuY29tIn19.k7suK-WgeuWZgIKwDTToVuJd810Vk2iMc55pmI97dzA" \
      -d '{
            "patient_id": 1,
            "criteria_1": 1,

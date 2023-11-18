@@ -26,10 +26,11 @@ class ScoreController {
     
         for ($i = 1; $i <= 20; $i++) {
             $criteriaKey = 'criteria_' . $i;
-            if (!isset($request[$criteriaKey]) || !is_bool($request[$criteriaKey])) {
-                $request[$criteriaKey] = false;
+            if (!isset($request[$criteriaKey])) {
+                $request[$criteriaKey] = NULL;
             }
         }
+        
     
         if ($this->scoreModel->insertNewScoreRecord($patientId, $request, $totalScore)) {
             return ['status' => 'success', 'message' => 'Score calculated and record inserted', 'score' => $totalScore];
