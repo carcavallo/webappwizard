@@ -89,7 +89,25 @@ class ScoreModel {
         }
     }
 
+    public function getPatientData($patientId) {
+        $sql = "SELECT * FROM patients WHERE id = :patient_id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':patient_id', $patientId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("PDOException in getPatientData: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function updateScoreRecord($scoreId, $data) {
+        if ($this->isScoreSaved($scoreId)) {
+            return false;
+        }
+
         $criteriaData = array_filter($data, function($key) {
             return strpos($key, 'criteria_') === 0;
         }, ARRAY_FILTER_USE_KEY);
@@ -130,6 +148,18 @@ class ScoreModel {
         }
     }
     
+    private function isScoreSaved($scoreId) {
+        $sql = "SELECT saved FROM patient_scores WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $scoreId]);
+            $saved = $stmt->fetchColumn();
+            return $saved == 1;
+        } catch (PDOException $e) {
+            error_log("PDOException in isScoreSaved: " . $e->getMessage());
+            return false;
+        }
+    }
      
     public function deleteScoreRecord($scoreId) {
         try {
