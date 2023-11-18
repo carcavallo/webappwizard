@@ -50,6 +50,10 @@ class ScoreController {
     public function updateScore($scoreId) {
         $data = json_decode(file_get_contents('php://input'), true);
     
+        if (!is_array($data)) {
+            return ['status' => 'error', 'message' => 'Invalid input data'];
+        }
+    
         $updateResult = $this->scoreModel->updateScoreRecord($scoreId, $data);
         if ($updateResult) {
             return ['status' => 'success', 'message' => 'Score updated successfully'];

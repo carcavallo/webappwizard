@@ -108,7 +108,11 @@ class Container {
             
         $router->put('/score/{scoreId}', function($scoreId) use ($scoreController) {
             $data = json_decode(file_get_contents('php://input'), true);
-            $response = $scoreController->updateScore($scoreId, $data['criteria'], $data['totalScore']);
+        
+            $criteria = isset($data['criteria']) ? $data['criteria'] : [];
+            $totalScore = isset($data['totalScore']) ? $data['totalScore'] : null;
+        
+            $response = $scoreController->updateScore($scoreId, $criteria, $totalScore);
             Utils::sendJsonResponse($response);
         });
     

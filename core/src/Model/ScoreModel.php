@@ -90,25 +90,22 @@ class ScoreModel {
                 $criteriaSet[] = "$key = :$key";
                 $parameters[":$key"] = $value ? 1 : 0;
             }
+    
+            $totalScore = $this->calculateScore($criteriaData);
+            $parameters[':total_score'] = $totalScore;
+    
             $criteriaSetString = implode(', ', $criteriaSet);
-            $sql = "UPDATE patient_scores SET $criteriaSetString WHERE id = :id";
+            $sql = "UPDATE patient_scores SET $criteriaSetString, total_score = :total_score WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute($parameters);
     
-            $totalScore = $this->calculateScore($criteriaData);
-    
-            $sql = "UPDATE patient_scores SET total_score = :total_score WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':total_score' => $totalScore, ':id' => $scoreId]);
-    
-            return $stmt->rowCount() > 0;
+            return true;
         } catch (PDOException $e) {
             error_log("PDOException in updateScoreRecord: " . $e->getMessage());
             return false;
         }
     }
-    
-
+     
     public function deleteScoreRecord($scoreId) {
         try {
             $sql = "DELETE FROM patient_scores WHERE id = :id";
