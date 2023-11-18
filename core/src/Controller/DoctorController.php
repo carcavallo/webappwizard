@@ -154,13 +154,38 @@ class DoctorController {
             $mail->Password = $_ENV['EMAIL_PASSWORD'];
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
+            $mail->CharSet = 'UTF-8';
     
             $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Registration');
             $mail->addAddress($email);
     
             $mail->isHTML(true);
             $mail->Subject = 'Ihre Flip-Flop-Score Anmeldung';
-            $mail->Body    = 'Ihr Konto wurde aktiviert.<br>Ihr Benutzername: ' . htmlspecialchars($email) . '<br>Ihr Passwort: ' . htmlspecialchars($password);
+            
+            // Here's the added text in the correct format
+            $mail->Body = 'Ihr Konto wurde aktiviert.<br>'
+                . 'Ihr Benutzername: ' . htmlspecialchars($email) . '<br>'
+                . 'Ihr Passwort: ' . htmlspecialchars($password) . '<br><br>'
+                . 'Wir freuen uns über Ihr Interesse zur Nutzung des Flip-Flop-Scores. Wir empfehlen die Anwendung des Flip-Flop-Scores bei Diagnosestellung von atopischer Dermatitis, Psoriasis und klinischen Überlappungsformen von atopischer Dermatitis und Psoriasis sowie die erneute Anwendung im weiteren Therapieverlauf der Patienten (Anwendung bis zu vier Mal pro Patienten möglich).'
+                . '<br><br>'
+                . 'Der Flip-Flop-Score setzt sich aus insgesamt 20 Anamnese- und Untersuchungskriterien zusammen. Wir empfehlen zur Nutzung folgendes Vorgehen:'
+                . '<br><br>'
+                . 'Füllen Sie in der Flip-Flop-App die Patientenangaben aus, um ein neues Patienten-Dossier zu erstellen.'
+                . '<br><br>'
+                . 'Die Flip-Flop-App generiert automatisch eine eindeutige Identifikationsnummer, welche Sie künftig zur Identifizierung des Patienten in der Flip-Flop-App verwenden müssen.'
+                . '<br><br>'
+                . 'Damit trotz der Anonymisierung der Patientendaten eine Zuordnung geschehen kann, besteht die Identifikationsnummer aus den folgenden Informationen: Geschlecht, Geburtsdatum, zufällige Nummer'
+                . '<br><br>'
+                . 'Bearbeiten Sie den Score, indem Sie hinter jedem Kriterium anklicken, ob das Kriterium vorliegt ("ja") oder nicht vorliegt ("nein").'
+                . '<br><br>'
+                . 'Anschließend wird der Score berechnet und Sie erhalten unmittelbar im Anschluss das Ergebnis, welches Ihnen bei der Einordnung Ihrer Patienten in die Krankheitsgruppen atopische Dermatitis, Psoriasis oder Flip-Flop helfen kann.'
+                . '<br><br>'
+                . 'Bestimmen Sie im Therapieverlauf erneut den Flip-Flop-Score bei weiteren Verlaufsterminen Ihrer Patienten, um Ihre Patienten im weiteren Therapieverlauf verfolgen zu können. Tragen Sie auch hier Datum und Scoreergebnis in Ihre Patientenliste ein. Sie können den Flip-Flop-Score pro Patienten bis zu viermal bestimmen. Wir empfehlen die Score-Bestimmung vor allem vor und nach Einleitung einer immunmodulierenden Systemtherapie sowie im Falle eines eintretenden Flip-Flops.'
+                . '<br><br>'
+                . 'Nach jeder Eingabe erhalten Sie das Ergebnis der Scoreberechnung per Mail zugeschickt, damit Sie das Ergebnis zusätzlich in Ihrer Patientenakte ablegen können, falls gewünscht.'
+                . '<br><br>'
+                . 'Für Rückfragen stehen wir gerne unter info@ck-care.ch zur Verfügung.';
+            
             $mail->AltBody = 'Ihr Konto wurde aktiviert. Ihr Benutzername: ' . htmlspecialchars($email) . '. Ihr Passwort: ' . htmlspecialchars($password);
     
             $mail->send();
@@ -169,7 +194,7 @@ class DoctorController {
             error_log('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
             return false;
         }
-    }
+    }    
     
     private function validateRegistrationData($data) {
         return filter_var($data['email'], FILTER_VALIDATE_EMAIL) && !empty($data['vorname']) && !empty($data['nachname']);
