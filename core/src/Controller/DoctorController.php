@@ -194,7 +194,7 @@ class DoctorController {
             error_log('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo);
             return false;
         }
-    }    
+    }
     
     private function validateRegistrationData($data) {
         return filter_var($data['email'], FILTER_VALIDATE_EMAIL) && !empty($data['vorname']) && !empty($data['nachname']);

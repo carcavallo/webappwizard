@@ -111,4 +111,17 @@ class DoctorModel {
         }
         return false;
     }
+
+    public function getDoctorEmailByPatientId($patientId) {
+        $sql = "SELECT email FROM doctors WHERE id = (SELECT doctor_id FROM patients WHERE id = :patient_id)";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':patient_id', $patientId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log('PDOException in getDoctorEmailByPatientId: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

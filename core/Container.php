@@ -26,7 +26,7 @@ class Container {
     private function initServices() {
         $this->services['DoctorModel'] = new DoctorModel($this->pdo);
         $this->services['PatientModel'] = new PatientModel($this->pdo);
-        $this->services['ScoreModel'] = new ScoreModel($this->pdo);
+        $this->services['ScoreModel'] = new ScoreModel($this->pdo, $this->services['DoctorModel']);
         $this->services['AdminModel'] = new AdminModel($this->pdo);
 
         $this->services['DoctorController'] = new DoctorController($this->services['DoctorModel']);
