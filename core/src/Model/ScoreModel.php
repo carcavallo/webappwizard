@@ -8,15 +8,30 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PR24\Model\DoctorModel;
 
+/**
+ * ScoreModel handles database interactions related to score functionalities.
+ */
 class ScoreModel {
     protected $db;
     protected $doctorModel;
 
+    /**
+     * Constructor to initialize database and DoctorModel.
+     *
+     * @param PDO $db Database connection object.
+     * @param DoctorModel $doctorModel The model handling doctor data.
+     */    
     public function __construct(PDO $db, DoctorModel $doctorModel) {
         $this->db = $db;
         $this->doctorModel = $doctorModel;
     }
 
+    /**
+     * Checks if a new score can be calculated for a patient.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return bool True if a new score can be calculated, false otherwise.
+     */    
     public function canCalculateNewScore($patientId) {
         $sql = "SELECT COUNT(*) FROM patient_scores WHERE patient_id = :patient_id";
         $stmt = $this->db->prepare($sql);
@@ -25,6 +40,12 @@ class ScoreModel {
         return $count < 4;
     }
 
+    /**
+     * Calculates the score based on given criteria.
+     *
+     * @param array $criteria Criteria for score calculation.
+     * @return float Calculated score.
+     */    
     public function calculateScore($criteria) {
         $criteriaScores = [
             'criteria_1' => 4.18, 'criteria_2' => 0.35, 'criteria_3' => 0.24,
@@ -46,6 +67,14 @@ class ScoreModel {
         return $totalScore;
     }
 
+    /**
+     * Inserts a new score record into the database.
+     *
+     * @param int $patientId The ID of the patient.
+     * @param array $criteria Criteria used for the score calculation.
+     * @param float $totalScore The calculated total score.
+     * @return bool True on successful insertion, false on failure.
+     */    
     public function insertNewScoreRecord($patientId, $criteria, $totalScore) {
         $allCriteriaSet = true;
         $defaultCriteria = array_fill_keys(array_map(function($i) { return 'criteria_' . $i; }, range(1, 20)), NULL);
@@ -74,7 +103,12 @@ class ScoreModel {
         return $stmt->rowCount() > 0;
     }
     
-
+    /**
+     * Retrieves scores by patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array Scores of the specified patient.
+     */
     public function getScoresByPatientId($patientId) {
         $sql = "SELECT * FROM patient_scores WHERE patient_id = :patient_id";
         $stmt = $this->db->prepare($sql);
@@ -82,6 +116,12 @@ class ScoreModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves patient data by patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array|null Patient data if found, null otherwise.
+     */
     public function getPatientData($patientId) {
         $sql = "SELECT * FROM patients WHERE id = :patient_id";
         $stmt = $this->db->prepare($sql);
@@ -90,11 +130,20 @@ class ScoreModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Updates a score record in the database.
+     *
+     * @param int $scoreId The ID of the score record.
+     * @param array $data Data for updating the score.
+     * @return bool True on successful update, false on failure.
+     */    
     public function updateScoreRecord($scoreId, $data) {
         $criteriaData = array_filter($data, function($key) {
             return strpos($key, 'criteria_') === 0;
         }, ARRAY_FILTER_USE_KEY);
+
         $allCriteriaSet = true;
+
         foreach ($criteriaData as $key => &$value) {
             if (isset($value) && in_array($value, [0, 1])) {
                 $value = (bool)$value;
@@ -105,16 +154,19 @@ class ScoreModel {
         }
         $parameters = [':id' => $scoreId];
         $criteriaSet = [];
+
         foreach ($criteriaData as $key => $value) {
             $criteriaSet[] = "$key = :$key";
             $parameters[":$key"] = $value ? 1 : 0;
         }
+
         $totalScore = $this->calculateScore($criteriaData);
         $parameters[':total_score'] = $totalScore;
         $criteriaSetString = implode(', ', $criteriaSet);
         $sql = "UPDATE patient_scores SET $criteriaSetString, total_score = :total_score WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute($parameters);
+
         if ($allCriteriaSet) {
             $patientId = $this->getPatientIdByScoreId($scoreId);
             if ($patientId) {
@@ -124,6 +176,12 @@ class ScoreModel {
         return true;
     }
 
+    /**
+     * Deletes a score record from the database.
+     *
+     * @param int $scoreId The ID of the score record to delete.
+     * @return bool True on successful deletion, false on failure.
+     */    
     public function deleteScoreRecord($scoreId) {
         $sql = "DELETE FROM patient_scores WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -131,6 +189,12 @@ class ScoreModel {
         return $stmt->rowCount() > 0;
     }
 
+    /**
+     * Generates a PDF report for a patient.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return string File path of the generated PDF.
+     */    
     public function generatePdf($patientId) {
         $patientIdStr = $this->getPatientIdStr($patientId);
         $scores = $this->getScoresByPatientId($patientId);
@@ -154,7 +218,12 @@ class ScoreModel {
         return $pdfPath;
     }
     
-
+    /**
+     * Retrieves the patient identifier string based on patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return string The patient identifier string.
+     */
     private function getPatientIdStr($patientId) {
         $sql = "SELECT patient_id FROM patients WHERE id = :patient_id";
         $stmt = $this->db->prepare($sql);
@@ -163,6 +232,12 @@ class ScoreModel {
         return $stmt->fetchColumn();
     }
 
+    /**
+     * Generates and sends a score report via email.
+     *
+     * @param int $patientId The ID of the patient.
+     * @param float $totalScore The total score of the patient.
+     */    
     public function generateAndSendScoreReport($patientId, $totalScore) {
         $pdfPath = $this->generatePdf($patientId, $totalScore);
         $doctorEmail = $this->doctorModel->getDoctorEmailByPatientId($patientId);
@@ -171,6 +246,12 @@ class ScoreModel {
         }
     }
 
+    /**
+     * Sends an email containing the score report to the doctor.
+     *
+     * @param string $doctorEmail The email address of the doctor.
+     * @param string $pdfPath The file path of the PDF score report.
+     */    
     public function sendScoreEmail($doctorEmail, $pdfPath) {
         $mail = new PHPMailer(true);
         $mail->SMTPDebug = 0;
@@ -194,6 +275,12 @@ class ScoreModel {
         $mail->send();
     }
 
+    /**
+     * Retrieves the patient ID associated with a specific score record.
+     *
+     * @param int $scoreId The ID of the score record.
+     * @return int The patient ID associated with the score.
+     */    
     private function getPatientIdByScoreId($scoreId) {
         $sql = "SELECT patient_id FROM patient_scores WHERE id = :score_id";
         $stmt = $this->db->prepare($sql);

@@ -1,16 +1,31 @@
 <?php
+
 namespace PR24\Model;
 
 use PDO;
 use PDOException;
 
+/**
+ * DoctorModel handles database interactions related to doctor functionalities.
+ */
 class DoctorModel {
     protected $db;
 
+    /**
+     * Constructor to initialize the database connection.
+     * 
+     * @param PDO $db Database connection object.
+     */
     public function __construct(PDO $db) {
         $this->db = $db;
     }
 
+    /**
+     * Creates a new doctor record in the database.
+     *
+     * @param array $doctorData The doctor's data.
+     * @return int|false The newly created doctor ID or false on failure.
+     */
     public function createDoctor($doctorData) {
         if (isset($doctorData['password']) && !empty($doctorData['password'])) {
             $hashedPassword = password_hash($doctorData['password'], PASSWORD_DEFAULT);
@@ -45,6 +60,12 @@ class DoctorModel {
         }
     }
 
+    /**
+     * Checks if a doctor is activated.
+     *
+     * @param int $doctorId The ID of the doctor.
+     * @return bool|null True if activated, false if not, null if doctor doesn't exist.
+     */
     public function isDoctorActivated($doctorId) {
         $sql = "SELECT activated FROM doctors WHERE id = :id";
     
@@ -63,7 +84,13 @@ class DoctorModel {
             return null;
         }
     }
-    
+
+    /**
+     * Activates a doctor and sets a new password.
+     *
+     * @param int $doctorId The ID of the doctor.
+     * @return string|false The new password or false on failure.
+     */
     public function activateDoctorAndSetPassword($doctorId) {
         $newPassword = $this->generateRandomPassword();
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
@@ -85,6 +112,12 @@ class DoctorModel {
         }
     }
 
+    /**
+     * Generates a random password.
+     *
+     * @param int $length Length of the password.
+     * @return string The generated password.
+     */
     private function generateRandomPassword($length = 10) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -95,12 +128,25 @@ class DoctorModel {
         return $randomPassword;
     }
 
+    /**
+     * Retrieves the email of a doctor by their ID.
+     *
+     * @param int $doctorId The ID of the doctor.
+     * @return string|null The email of the doctor or null if not found.
+     */
     public function getDoctorEmailById($doctorId) {
         $stmt = $this->db->prepare("SELECT email FROM doctors WHERE id = :id");
         $stmt->execute([':id' => $doctorId]);
         return $stmt->fetchColumn();
     }    
 
+    /**
+     * Validates the credentials of a doctor.
+     *
+     * @param string $email The email of the doctor.
+     * @param string $password The password of the doctor.
+     * @return bool True if credentials are valid, false otherwise.
+     */
     public function validateCredentials($email, $password) {
         $stmt = $this->db->prepare("SELECT password FROM doctors WHERE email = :email");
         $stmt->execute([':email' => $email]);
@@ -112,6 +158,12 @@ class DoctorModel {
         return false;
     }
 
+    /**
+     * Retrieves the email of a doctor associated with a patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return string|null The email of the doctor or null if not found.
+     */
     public function getDoctorEmailByPatientId($patientId) {
         $sql = "SELECT email FROM doctors WHERE id = (SELECT doctor_id FROM patients WHERE id = :patient_id)";
         try {

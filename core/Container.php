@@ -14,15 +14,24 @@ use PR24\Controller\AdminController;
 
 use PDO;
 
+/**
+ * Container class for dependency injection and route setup.
+ */
 class Container {
     private $pdo;
     private $services = [];
-
+    
+    /**
+     * Constructor initializes the database connection and services.
+     */
     public function __construct() {
         $this->pdo = new PDO('mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
         $this->initServices();
     }
 
+    /**
+     * Initializes services and models.
+     */    
     private function initServices() {
         $this->services['DoctorModel'] = new DoctorModel($this->pdo);
         $this->services['PatientModel'] = new PatientModel($this->pdo);
@@ -35,6 +44,11 @@ class Container {
         $this->services['AdminController'] = new AdminController($this->services['AdminModel']);
     }
 
+    /**
+     * Sets up application routes.
+     *
+     * @param Router $router Router object for defining routes.
+     */    
     public function setupRoutes(Router $router) {
         $doctorController = $this->get('DoctorController');
         $patientController = $this->get('PatientController');
@@ -131,6 +145,12 @@ class Container {
         });
     }
 
+    /**
+     * Gets a service by its name.
+     *
+     * @param string $serviceName Name of the service to retrieve.
+     * @return mixed The requested service or null if not found.
+     */    
     public function get($serviceName) {
         return $this->services[$serviceName] ?? null;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Controller;
 
 use PR24\Model\DoctorModel;
@@ -6,13 +7,26 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Firebase\JWT\JWT;
 
+/**
+ * DoctorController handles doctor-related actions such as authentication, registration, and activation.
+ */
 class DoctorController {
     protected $doctorModel;
 
+    /**
+     * Constructor for the DoctorController class.
+     *
+     * @param DoctorModel $doctorModel The model handling doctor data.
+     */
     public function __construct(DoctorModel $doctorModel) {
         $this->doctorModel = $doctorModel;
     }
     
+    /**
+     * Authenticates a doctor and generates a JWT token.
+     *
+     * @return array Result of authentication with JWT token if successful.
+     */
     public function authenticate() {
         $credentials = json_decode(file_get_contents('php://input'), true);
     
@@ -34,6 +48,11 @@ class DoctorController {
         }
     }
 
+    /**
+     * Registers a new doctor in the system.
+     *
+     * @return array The result of the registration process.
+     */
     public function register() {
         $requestBody = json_decode(file_get_contents('php://input'), true);
 
@@ -65,6 +84,12 @@ class DoctorController {
         }
     }
 
+    /**
+     * Activates a doctor's account and sends a new password.
+     *
+     * @param int $userId The ID of the doctor to activate.
+     * @return array The result of the activation process.
+     */
     public function activateUser($userId) {
         $isActivated = $this->doctorModel->isDoctorActivated($userId);
         if ($isActivated === true) {
@@ -86,6 +111,13 @@ class DoctorController {
         }
     }
     
+    /**
+     * Sends an email for registration confirmation.
+     *
+     * @param array $registrationData The registration data of the doctor.
+     * @param int $userId The ID of the newly registered doctor.
+     * @return bool True if the email was sent successfully, false otherwise.
+     */
     private function sendRegistrationConfirmationEmail($registrationData, $userId) {
         $mail = new PHPMailer(true);
 
@@ -142,6 +174,13 @@ class DoctorController {
         }
     }
 
+    /**
+     * Sends an email to a doctor with their new password.
+     *
+     * @param string $email The email address of the doctor.
+     * @param string $password The new password for the doctor.
+     * @return bool True if the email was sent successfully, false otherwise.
+     */    
     private function sendPasswordEmail($email, $password) {
         $mail = new PHPMailer(true);
     
@@ -162,7 +201,6 @@ class DoctorController {
             $mail->isHTML(true);
             $mail->Subject = 'Ihre Flip-Flop-Score Anmeldung';
             
-            // Here's the added text in the correct format
             $mail->Body = 'Ihr Konto wurde aktiviert.<br>'
                 . 'Ihr Benutzername: ' . htmlspecialchars($email) . '<br>'
                 . 'Ihr Passwort: ' . htmlspecialchars($password) . '<br><br>'
@@ -196,6 +234,12 @@ class DoctorController {
         }
     }
     
+    /**
+     * Validates the registration data of a doctor.
+     *
+     * @param array $data Registration data to be validated.
+     * @return bool True if the data is valid, false otherwise.
+     */
     private function validateRegistrationData($data) {
         return filter_var($data['email'], FILTER_VALIDATE_EMAIL) && !empty($data['vorname']) && !empty($data['nachname']);
     }

@@ -4,13 +4,27 @@ namespace PR24\Model;
 use PDO;
 use PDOException;
 
+/**
+ * PatientModel handles database interactions related to patient functionalities.
+ */
 class PatientModel {
     protected $db;
 
+    /**
+     * Constructor to initialize the database connection.
+     *
+     * @param PDO $db Database connection object.
+     */    
     public function __construct(PDO $db) {
         $this->db = $db;
     }
 
+    /**
+     * Creates a new patient record in the database.
+     *
+     * @param array $patientData Data for the new patient.
+     * @return int|false The ID of the newly created patient or false on failure.
+     */
     public function createPatient($patientData) {
         $sql = "INSERT INTO patients (patient_id, doctor_id, geburtsdatum, geschlecht, ethnie, vermutete_diagnose, histopathologische_untersuchung, histopathologie_ergebnis, bisherige_lokaltherapie_sonstiges, bisherige_systemtherapie_sonstiges, aktuelle_lokaltherapie_sonstiges, aktuelle_systemtherapie_sonstiges, jucken_letzte_24_stunden) VALUES (:patient_id, :doctor_id, :geburtsdatum, :geschlecht, :ethnie, :vermutete_diagnose, :histopathologische_untersuchung, :histopathologie_ergebnis, :bisherige_lokaltherapie_sonstiges, :bisherige_systemtherapie_sonstiges, :aktuelle_lokaltherapie_sonstiges, :aktuelle_systemtherapie_sonstiges, :jucken_letzte_24_stunden)";
 
@@ -24,6 +38,12 @@ class PatientModel {
         }
     }
 
+    /**
+     * Retrieves a patient record by ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array|null Patient data if found, null otherwise.
+     */
     public function getPatientById($patientId) {
         $sql = "SELECT * FROM patients WHERE id = :patient_id";
         $stmt = $this->db->prepare($sql);
@@ -31,6 +51,13 @@ class PatientModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Updates a patient record.
+     *
+     * @param int $patientId The ID of the patient to update.
+     * @param array $patientData Updated data for the patient.
+     * @return bool True on successful update, false on failure.
+     */    
     public function updatePatient($patientId, $patientData) {
         $sql = "UPDATE patients SET 
                     doctor_id = :doctor_id, 
@@ -72,7 +99,12 @@ class PatientModel {
         }
     }
     
-
+    /**
+     * Deletes a patient record from the database.
+     *
+     * @param int $patientId The ID of the patient to delete.
+     * @return bool True on successful deletion, false on failure.
+     */
     public function deletePatient($patientId) {
         $sql = "DELETE FROM patients WHERE id = :patient_id";
         $stmt = $this->db->prepare($sql);

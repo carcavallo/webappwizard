@@ -3,13 +3,26 @@ namespace PR24\Controller;
 
 use PR24\Model\PatientModel;
 
+/**
+ * PatientController handles actions related to patient management.
+ */
 class PatientController {
     protected $patientModel;
 
+    /**
+     * Constructor for the PatientController class.
+     *
+     * @param PatientModel $patientModel The model handling patient data.
+     */
     public function __construct(PatientModel $patientModel) {
         $this->patientModel = $patientModel;
     }
 
+    /**
+     * Creates a new patient record.
+     *
+     * @return array Result of the patient creation process.
+     */
     public function createPatient() {
         $request = json_decode(file_get_contents('php://input'), true);
         $patientData = $this->preparePatientData($request);
@@ -26,6 +39,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Prepares patient data from the request.
+     *
+     * @param array $request The request data.
+     * @return array The prepared patient data.
+     */
     private function preparePatientData($request) {
         $birthYear = date('Y', strtotime($request['geburtsdatum'] ?? ''));
         $genderLetter = strtolower(substr($request['geschlecht'] ?? '', 0, 1));
@@ -50,6 +69,12 @@ class PatientController {
         return $patientData;
     }
 
+    /**
+     * Retrieves patient data based on patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array The result of the read operation.
+     */    
     public function readPatient($patientId) {
         $patientData = $this->patientModel->getPatientById($patientId);
         if ($patientData) {
@@ -59,6 +84,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Updates patient data based on patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array The result of the update operation.
+     */    
     public function updatePatient($patientId) {
         $request = json_decode(file_get_contents('php://input'), true);
         $patientData = $this->preparePatientData($request);
@@ -74,6 +105,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Deletes a patient record based on patient ID.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array The result of the delete operation.
+     */    
     public function deletePatient($patientId) {
         if ($this->patientModel->deletePatient($patientId)) {
             return ['status' => 'success', 'message' => 'Patient deletion successful'];
@@ -82,6 +119,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Validates the patient data.
+     *
+     * @param array $data The patient data to validate.
+     * @return bool True if valid, false otherwise.
+     */    
     private function validatePatientData($data) {
         return !empty($data['doctor_id']) && !empty($data['geburtsdatum']) && !empty($data['geschlecht']);
     }
