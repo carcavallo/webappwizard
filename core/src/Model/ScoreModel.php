@@ -210,7 +210,7 @@ class ScoreModel {
     
         $pdf->Write(0, $pdfContent, '', 0, 'L', true, 0, false, false, 0);
     
-        $pdfDirectory = '/home/synopsis/develop/WebAppWizard/core/pdf/';
+        $pdfDirectory = __DIR__ . '/../pdf/';
         $pdfFileName = "PatientenScores_" . $patientIdStr . ".pdf";
         $pdfPath = $pdfDirectory . $pdfFileName;
     

@@ -56,9 +56,7 @@ class AdminController {
     }
 
     /**
-     * Exports patient data in CSV format.
-     *
-     * @return array Status of the export operation with message, success or failure.
+     * Exports all patients data in CSV format.
      */
     public function exportPatientData() {
         try {
