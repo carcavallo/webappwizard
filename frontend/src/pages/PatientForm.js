@@ -93,6 +93,10 @@ const PatientForm = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   const validateForm = () => {
     for (const [key, value] of Object.entries(patientData)) {
       if (
@@ -558,6 +562,14 @@ const PatientForm = () => {
 
         <button type="submit" className="btn btn-primary mb-3">
           Patientendaten Speichern
+        </button>
+        <br />
+        <button
+          type="button"
+          className="btn btn-secondary mb-3"
+          onClick={handleBack}
+        >
+          Zurück
         </button>
       </form>
     </div>

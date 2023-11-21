@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import scoreScaleImage from '../assets/score.png'; // Ensure this path is correct
+import scoreScaleImage from '../assets/score.png';
 
 const ScoreDisplay = () => {
   const { id } = useParams();
@@ -10,7 +10,7 @@ const ScoreDisplay = () => {
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve the token from localStorage or context
+        const token = localStorage.getItem('token');
         const response = await axios.get(`http://localhost/api/scores/${id}`, {
           headers: {
             'Content-Type': 'application/json',
@@ -18,12 +18,10 @@ const ScoreDisplay = () => {
           },
         });
         if (response.data.status === 'success') {
-          // Set the score using the first element's total_score from the response
           setScore(response.data.scores[0].total_score);
         }
       } catch (error) {
         console.error(error);
-        // Handle error, e.g., set an error state or message
       }
     };
 
@@ -31,8 +29,7 @@ const ScoreDisplay = () => {
   }, [id]);
 
   const getScorePosition = score => {
-    // Adjust this logic if needed based on how you want to display the score
-    const maxScore = 12; // Adjust the maximum score if necessary
+    const maxScore = 12;
     const scoreOffset = (100 * (parseFloat(score) + maxScore)) / (2 * maxScore);
     return scoreOffset;
   };
@@ -43,8 +40,6 @@ const ScoreDisplay = () => {
     <div className="container mt-5">
       {score !== null ? (
         <div style={{ position: 'relative', height: '192px' }}>
-          {' '}
-          {/* Adjusted for the given height */}
           <img
             src={scoreScaleImage}
             alt="Score Scale"
@@ -54,18 +49,16 @@ const ScoreDisplay = () => {
             style={{
               position: 'absolute',
               left: `${scorePosition}%`,
-              bottom: '-40px', // Align with the bottom of the scale
+              bottom: '-40px',
             }}
           >
-            {/* Score indicator, e.g., a vertical line */}
             <div
               style={{ width: '5px', height: '89px', backgroundColor: 'red' }}
             />
-            {/* Score value, aligned with the other scale numbers */}
             <div
               style={{
                 position: 'absolute',
-                bottom: '90px', // Adjust this value as needed
+                bottom: '90px',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 color: 'black',

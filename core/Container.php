@@ -60,7 +60,7 @@ class Container {
         $adminController = $this->get('AdminController');
         $therapyOptionsController = $this->get('TherapyOptionsController');
 
-        $router->before('GET|POST|PUT|DELETE', '/(?!auth/user/register|auth/user/activate|auth/user/login|auth/admin/login).*', function() {
+        $router->before('GET|POST|PUT|DELETE', '/(?!auth/user/register|auth/validate-token|auth/user/activate|auth/user/login|auth/admin/login).*', function() {
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         
             if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
@@ -92,6 +92,14 @@ class Container {
             $router->get("/user/activate/{userId}", function($userId) use ($doctorController) {
                 $response = $doctorController->activateUser($userId);
                 Utils::sendJsonResponse($response);
+            });
+            $router->post('/validate-token', function() {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $token = $data['token'] ?? '';
+    
+                $validationResult = JWTMiddleware::validateToken($token);
+    
+                Utils::sendJsonResponse($validationResult);
             });
         });
 
