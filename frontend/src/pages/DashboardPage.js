@@ -10,9 +10,14 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await axios.get(`http://localhost/api/user/${userId}/patients`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        const response = await axios.get(
+          `http://localhost/api/user/${userId}/patients`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
         if (response.data.status === 'success') {
           setPatients(response.data.data);
         }
@@ -34,7 +39,7 @@ const DashboardPage = () => {
     navigate('/');
   };
 
-  const handlePatientClick = (patientId) => {
+  const handlePatientClick = patientId => {
     navigate(`/patient/${patientId}/score`);
   };
 
@@ -57,8 +62,13 @@ const DashboardPage = () => {
       ) : (
         <p>Es wurden noch keine Patienten erfasst.</p>
       )}
-      <button onClick={handleAddPatient} className="btn btn-primary mt-3">Patienten registrieren</button><br />
-      <button onClick={handleLogout} className="btn btn-secondary mt-3">Logout</button>
+      <button onClick={handleAddPatient} className="btn btn-primary mt-3">
+        Patienten registrieren
+      </button>
+      <br />
+      <button onClick={handleLogout} className="btn btn-secondary mt-3">
+        Logout
+      </button>
     </div>
   );
 };

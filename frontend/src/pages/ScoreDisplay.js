@@ -14,7 +14,7 @@ const ScoreDisplay = () => {
         const response = await axios.get(`http://localhost/api/scores/${id}`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (response.data.status === 'success') {
@@ -30,10 +30,10 @@ const ScoreDisplay = () => {
     fetchScores();
   }, [id]);
 
-  const getScorePosition = (score) => {
+  const getScorePosition = score => {
     // Adjust this logic if needed based on how you want to display the score
     const maxScore = 12; // Adjust the maximum score if necessary
-    const scoreOffset = 100 * (parseFloat(score) + maxScore) / (2 * maxScore);
+    const scoreOffset = (100 * (parseFloat(score) + maxScore)) / (2 * maxScore);
     return scoreOffset;
   };
 
@@ -42,8 +42,14 @@ const ScoreDisplay = () => {
   return (
     <div className="container mt-5">
       {score !== null ? (
-        <div style={{ position: 'relative', height: '192px' }}> {/* Adjusted for the given height */}
-          <img src={scoreScaleImage} alt="Score Scale" style={{ width: '100%' }} />
+        <div style={{ position: 'relative', height: '192px' }}>
+          {' '}
+          {/* Adjusted for the given height */}
+          <img
+            src={scoreScaleImage}
+            alt="Score Scale"
+            style={{ width: '100%' }}
+          />
           <div
             style={{
               position: 'absolute',
@@ -52,16 +58,20 @@ const ScoreDisplay = () => {
             }}
           >
             {/* Score indicator, e.g., a vertical line */}
-            <div style={{ width: '5px', height: '89px', backgroundColor: 'red' }} />
+            <div
+              style={{ width: '5px', height: '89px', backgroundColor: 'red' }}
+            />
             {/* Score value, aligned with the other scale numbers */}
-            <div style={{
-              position: 'absolute',
-              bottom: '90px', // Adjust this value as needed
-              left: '50%',
-              transform: 'translateX(-50%)',
-              color: 'black',
-              fontWeight: 'bold'
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '90px', // Adjust this value as needed
+                left: '50%',
+                transform: 'translateX(-50%)',
+                color: 'black',
+                fontWeight: 'bold',
+              }}
+            >
               {score}
             </div>
           </div>
