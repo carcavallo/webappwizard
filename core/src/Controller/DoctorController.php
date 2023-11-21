@@ -31,18 +31,25 @@ class DoctorController {
         $credentials = json_decode(file_get_contents('php://input'), true);
     
         if ($this->doctorModel->validateCredentials($credentials['email'], $credentials['password'])) {
+            $userId = $this->doctorModel->getDoctorIdByEmail($credentials['email']);
             $token = [
                 "iss" => $_ENV['BASEDOMAIN'],
                 "iat" => time(),
                 "exp" => time() + 3600,
                 "data" => [
-                    "email" => $credentials['email']
+                    "email" => $credentials['email'],
+                    "userId" => $userId
                 ]
             ];
             
             $jwt = JWT::encode($token, $_ENV['SECRET_KEY'], 'HS256');
     
-            return ['status' => 'success', 'message' => 'Authorized', 'token' => $jwt];
+            return [
+                'status' => 'success', 
+                'message' => 'Authorized',
+                'userId' => $userId, 
+                'token' => $jwt
+            ];
         } else {
             return ['status' => 'error', 'message' => 'Invalid credentials'];
         }
@@ -153,7 +160,7 @@ class DoctorController {
             $fieldsToSkip = ['anrede', 'titel', 'vorname', 'nachname'];
 
             foreach ($registrationData as $key => $value) {
-                if (!in_array($key, $fieldsToSkip)) {
+                if (!in_array($key, $fieldsToSkip) && !($key === 'taetigkeitsbereich_sonstiges' && empty($value))) {
                     $displayName = $keyMap[$key] ?? ucfirst($key);
                     $body .= htmlspecialchars($displayName . ": " . $value) . "<br>";
                 }

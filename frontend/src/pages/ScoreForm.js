@@ -20,51 +20,67 @@ const ScoreForm = () => {
     e.preventDefault();
     try {
       await axios.post('/api/score', scoreData);
-      history.push('/score-display');
+      navigate.push('/score-display');
     } catch (error) {
       console.error(error);
     }
   };
 
   const renderCriteria = (number, question) => (
-    <div className="form-group">
-      <label>{question}</label>
-      <div>
+    <tr>
+      <td>{question}</td>
+      <td>
         <input type="radio" id={`criteria_${number}_yes`} name={`criteria_${number}`} value="yes" onChange={handleChange} />
         <label htmlFor={`criteria_${number}_yes`}>Ja</label>
-      </div>
-      <div>
+      </td>
+      <td>
         <input type="radio" id={`criteria_${number}_no`} name={`criteria_${number}`} value="no" onChange={handleChange} />
         <label htmlFor={`criteria_${number}_no`}>Nein</label>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 
   return (
     <div className="container mt-5">
-      <h1>Flip-Flop-Score Formular</h1>
-      <form onSubmit={handleSubmit} className="mt-4">
-        {renderCriteria(1, "Positive Eigenanamnese für Atopie")}
-        {renderCriteria(2, "Bekannte Sensibilisierungen und/oder Nahrungsmittelunverträglichkeiten")}
-        {renderCriteria(3, "Positive Familienanamnese für Atopie")}
-        {renderCriteria(4, "Positive Familienanamnese für Psoriasis")}
-        {renderCriteria(5, "Abrupte Exazerbation nach Absetzen einer systemischen Steroidtherapie")}
-        {renderCriteria(6, "Gelenkschmerzen")}
-        {renderCriteria(7, "Daktylitis und/oder Enthesiopathien")}
-        {renderCriteria(8, "Dishydrosis")}
-        {renderCriteria(9, "Pusteln")}
-        {renderCriteria(10, "Psoriasis-typische Nagelveränderungen")}
-        {renderCriteria(11, "Palmare Hyperlinearität")}
-        {renderCriteria(12, "Kopfhautbefall vom Capillitium über die Stirn-Haargrenze hinaus")}
-        {renderCriteria(13, "Dennie-Morgan-Falte u./od. periorbitale Verschattung u./od. halonierte Augen")}
-        {renderCriteria(14, "Perlèche u./od. Cheilitis")}
-        {renderCriteria(15, "Plaques-Befall der Retroaurikulärregion")}
-        {renderCriteria(16, "Head Neck Dermatitis oder Dirty neck")}
-        {renderCriteria(17, "Keratosis pilaris")}
-        {renderCriteria(18, "Erythematosquamöse Plaques an Körper u./od. Extremitäten")}
-        {renderCriteria(19, "Ekzeme u./od. Lichenifizierung der Beugen")}
-        {renderCriteria(20, "Befall der Rima ani")}
-        <button type="submit" className="btn btn-primary">Score Berechnen</button>
+      <h1 className="mb-4">Flip-Flop-Score Formular</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="row">
+          <div className="col-md-6">
+            <h2>Anamnesekriterien</h2>
+            <table className="table">
+              <tbody>
+                {renderCriteria(1, "(1) Positive Eigenanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis)")}
+                {renderCriteria(2, "(2) Bek. Sensibilisierungen und/oder Nahrungsmittelunverträglichkeiten")}
+                {renderCriteria(3, "(3) Positive Familienanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis, „Ekzeme“)")}
+                {renderCriteria(4, "(4) Positive Familienanamnese für Psoriasis")}
+                {renderCriteria(5, "(5) Abrupte Exazerbation nach Absetzen einer systemischen Steroidtherapie")}
+                {renderCriteria(6, "(6) Gelenkschmerzen")}
+                {renderCriteria(7, "(7) Daktylitis und/oder Enthesiopathien (v.a. im Bereich der Achillessehne)")}
+              </tbody>
+            </table>
+          </div>
+          <div className="col-md-6">
+            <h2>Untersuchungskriterien</h2>
+            <table className="table">
+              <tbody>
+                {renderCriteria(8, "(8) Dishydrosis (aktuell oder in der Vergangenheit)")}
+                {renderCriteria(9, "(9) Pusteln (aktuell oder in der Vergangenheit; ausser im Gesicht)")}
+                {renderCriteria(10, "(10) Psoriasis-typische Nagelveränderungen (Tüpfel, Ölfleck, Dystrophie)")}
+                {renderCriteria(11, "(11) Palmare Hyperlinearität")}
+                {renderCriteria(12, "(12) Kopfhautbefall vom Capillitium über die Stirn-Haargrenze hinaus")}
+                {renderCriteria(13, "(13) Dennie-Morgan-Falte u./od. periorbitale Verschattung u./od. halonierte Augen")}
+                {renderCriteria(14, "(14) Perlèche u./od. Cheilitis (aktuell oder in der Vergangenheit)")}
+                {renderCriteria(15, "(15) Plaques-Befall der Retroaurikulärregion")}
+                {renderCriteria(16, "(16) Head Neck Dermatitis oder Dirty neck")}
+                {renderCriteria(17, "(17) Keratosis pilaris")}
+                {renderCriteria(18, "(18) Erythematosquamöse Plaques an Körper u./od. Extremitäten (aktuell oder in der Vergangenheit)")}
+                {renderCriteria(19, "(19) Ekzeme u./od. Lichenifizierung der Beugen (aktuell oder in der Vergangenheit)")}
+                {renderCriteria(20, "(20) Befall der Rima ani (Erythem und/oder Mazeration)")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <button type="submit" className="btn btn-primary mb-3">Berechnen</button>
       </form>
     </div>
   );

@@ -33,6 +33,8 @@ class PatientController {
 
         $patientId = $this->patientModel->createPatient($patientData);
         if ($patientId) {
+            $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
+            $systemTherapieIds = $request['systemtherapie'] ?? [];
             return ['status' => 'success', 'message' => 'Patient creation successful', 'patientId' => $patientId];
         } else {
             return ['status' => 'error', 'message' => 'Patient creation failed'];
@@ -60,10 +62,6 @@ class PatientController {
             'vermutete_diagnose' => $request['vermutete_diagnose'] ?? null,
             'histopathologische_untersuchung' => $request['histopathologische_untersuchung'] ?? null,
             'histopathologie_ergebnis' => $request['histopathologie_ergebnis'] ?? null,
-            'bisherige_lokaltherapie_sonstiges' => $request['bisherige_lokaltherapie_sonstiges'] ?? null,
-            'bisherige_systemtherapie_sonstiges' => $request['bisherige_systemtherapie_sonstiges'] ?? null,
-            'aktuelle_lokaltherapie_sonstiges' => $request['aktuelle_lokaltherapie_sonstiges'] ?? null,
-            'aktuelle_systemtherapie_sonstiges' => $request['aktuelle_systemtherapie_sonstiges'] ?? null,
             'jucken_letzte_24_stunden' => $request['jucken_letzte_24_stunden'] ?? null,
         ];
         return $patientData;
@@ -94,11 +92,9 @@ class PatientController {
         $request = json_decode(file_get_contents('php://input'), true);
         $patientData = $this->preparePatientData($request);
 
-        if (!$this->validatePatientData($patientData)) {
-            return ['status' => 'error', 'message' => 'Invalid patient data'];
-        }
-
         if ($this->patientModel->updatePatient($patientId, $patientData)) {
+            $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
+            $systemTherapieIds = $request['systemtherapie'] ?? [];
             return ['status' => 'success', 'message' => 'Patient update successful'];
         } else {
             return ['status' => 'error', 'message' => 'Patient update failed'];
@@ -116,6 +112,52 @@ class PatientController {
             return ['status' => 'success', 'message' => 'Patient deletion successful'];
         } else {
             return ['status' => 'error', 'message' => 'Patient deletion failed'];
+        }
+    }
+
+    /**
+     * Retrieves all patients for a specific doctor.
+     *
+     * @param int $userId The ID of the doctor.
+     * @return array The list of patients for the doctor.
+     */
+    public function getPatientsByDoctor($userId) {
+        $patients = $this->patientModel->getPatientsByDoctorId($userId);
+
+        if ($patients) {
+            return ['status' => 'success', 'data' => $patients];
+        } else {
+            return ['status' => 'error', 'message' => 'No patients found'];
+        }
+    }
+
+    public function updateBisherigeTherapien($patientId) {
+        $request = json_decode(file_get_contents('php://input'), true);
+        $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
+        $systemTherapieIds = $request['systemtherapie'] ?? [];
+
+        $lokaleResult = $this->patientModel->addBisherigeTherapie($patientId, $lokaleTherapieIds);
+        $systemResult = $this->patientModel->addBisherigeSystemtherapie($patientId, $systemTherapieIds);
+
+        if ($lokaleResult && $systemResult) {
+            return ['status' => 'success', 'message' => 'Bisherige Therapie updated successfully'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to update Bisherige Therapie'];
+        }
+    }
+
+    public function updateAktuelleTherapien($patientId) {
+        $request = json_decode(file_get_contents('php://input'), true);
+        $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
+        $systemTherapieIds = $request['systemtherapie'] ?? [];
+
+        $lokaleResult = $this->patientModel->addAktuelleTherapie($patientId, $lokaleTherapieIds);
+        $systemResult = $this->patientModel->addAktuelleSystemtherapie($patientId, $systemTherapieIds);
+
+        if ($lokaleResult && $systemResult) {
+            return ['status' => 'success', 'message' => 'Aktuelle Therapie updated successfully'];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to update Aktuelle Therapie'];
         }
     }
 

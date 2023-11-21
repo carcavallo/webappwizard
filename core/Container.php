@@ -7,10 +7,12 @@ use PR24\Model\DoctorModel;
 use PR24\Model\PatientModel;
 use PR24\Model\ScoreModel;
 use PR24\Model\AdminModel;
+use PR24\Model\TherapyOptionsModel;
 use PR24\Controller\DoctorController;
 use PR24\Controller\PatientController;
 use PR24\Controller\ScoreController;
 use PR24\Controller\AdminController;
+use PR24\Controller\TherapyOptionsController;
 
 use PDO;
 
@@ -37,11 +39,13 @@ class Container {
         $this->services['PatientModel'] = new PatientModel($this->pdo);
         $this->services['ScoreModel'] = new ScoreModel($this->pdo, $this->services['DoctorModel']);
         $this->services['AdminModel'] = new AdminModel($this->pdo);
+        $this->services['TherapyOptionsModel'] = new TherapyOptionsModel($this->pdo);
 
         $this->services['DoctorController'] = new DoctorController($this->services['DoctorModel']);
         $this->services['PatientController'] = new PatientController($this->services['PatientModel']);
         $this->services['ScoreController'] = new ScoreController($this->services['ScoreModel']);
         $this->services['AdminController'] = new AdminController($this->services['AdminModel']);
+        $this->services['TherapyOptionsController'] = new TherapyOptionsController($this->services['TherapyOptionsModel']);
     }
 
     /**
@@ -54,6 +58,7 @@ class Container {
         $patientController = $this->get('PatientController');
         $scoreController = $this->get('ScoreController');
         $adminController = $this->get('AdminController');
+        $therapyOptionsController = $this->get('TherapyOptionsController');
 
         $router->before('GET|POST|PUT|DELETE', '/(?!auth/user/register|auth/user/activate|auth/user/login|auth/admin/login).*', function() {
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
@@ -110,6 +115,11 @@ class Container {
             Utils::sendJsonResponse($response);
         });
 
+        $router->get('/user/{userId}/patients', function($userId) use ($patientController) {
+            $response = $patientController->getPatientsByDoctor($userId);
+            Utils::sendJsonResponse($response);
+        });
+
         $router->post("/score", function() use ($scoreController) {
             $response = $scoreController->createScore();
             Utils::sendJsonResponse($response);
@@ -142,6 +152,26 @@ class Container {
 
         $router->get("/admin/export", function() use ($adminController) {
             $adminController->exportPatientData();
+        });
+
+        $router->get('/therapy/lokale', function() use ($therapyOptionsController) {
+            $response = $therapyOptionsController->getLokaleTherapyOptions();
+            Utils::sendJsonResponse($response);
+        });
+
+        $router->get('/therapy/systemtherapie', function() use ($therapyOptionsController) {
+            $response = $therapyOptionsController->getSystemtherapieOptions();
+            Utils::sendJsonResponse($response);
+        });
+
+        $router->post('/patient-bisherige-therapien/{patientId}', function($patientId) use ($patientController) {
+            $response = $patientController->updateBisherigeTherapien($patientId);
+            Utils::sendJsonResponse($response);
+        });
+        
+        $router->post('/patient-aktuelle-therapien/{patientId}', function($patientId) use ($patientController) {
+            $response = $patientController->updateAktuelleTherapien($patientId);
+            Utils::sendJsonResponse($response);
         });
     }
 

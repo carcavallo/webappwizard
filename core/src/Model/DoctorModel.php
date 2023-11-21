@@ -129,6 +129,18 @@ class DoctorModel {
     }
 
     /**
+     * Retrieves the ID of a doctor by their email.
+     *
+     * @param string $email The email of the doctor.
+     * @return int|null The ID of the doctor or null if not found.
+     */
+    public function getDoctorIdByEmail($email) {
+        $stmt = $this->db->prepare("SELECT id FROM doctors WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        return $stmt->fetchColumn();
+    }
+
+    /**
      * Retrieves the email of a doctor by their ID.
      *
      * @param int $doctorId The ID of the doctor.

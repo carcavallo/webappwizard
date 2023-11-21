@@ -8,6 +8,15 @@ ini_set("upload_max_filesize", "256M");
 ini_set('display_errors', 1);
 
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    // Beendet die Ausführung des Skripts nach dem Senden der CORS-Header
+    exit(0);
+}
+
 date_default_timezone_set("Europe/Zurich");
 error_reporting(E_ALL);
 

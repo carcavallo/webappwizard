@@ -21,12 +21,12 @@ curl -X POST http://localhost/api/auth/user/login \
      -H "Content-Type: application/json" \
      -d '{
          "email": "alessio.carcavallo@pr24.ch",
-         "password": "C9LWT6jiTv"
+         "password": "UImoBBSQOH"
      }'
 
 curl -X POST http://localhost/api/patient \
      -H "Content-Type: application/json" \
-     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNDY3NjQ0LCJleHAiOjE3MDA0NzEyNDQsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCJ9fQ.a4dyxYWPjqYA03e81IEEmXQ76vofURXbQgINygnN_d4" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNTc5NzIzLCJleHAiOjE3MDA1ODMzMjMsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCIsInVzZXJJZCI6MX19.85m59_1BqgPlXaSg_RUvqLedyoJ4nMCz49Vu6h0k3_c" \
      -d '{
            "doctor_id": "1",
            "geburtsdatum": "2002-10-01",
@@ -136,4 +136,11 @@ curl -X POST http://localhost/api/auth/admin/login \
          "password": "toor"
      }'
 
-curl -X GET http://localhost/api/admin/export -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNDY3NjQ0LCJleHAiOjE3MDA0NzEyNDQsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCJ9fQ.a4dyxYWPjqYA03e81IEEmXQ76vofURXbQgINygnN_d4" -o patienten_daten.csv
+curl -X GET http://localhost/api/admin/export -H "Authorization: Bearer curl -X GET "http://localhost/therapy/lokale" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNTY3NzQ3LCJleHAiOjE3MDA1NzEzNDcsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCIsInVzZXJJZCI6MX19.R3GTpVc4ihXPNZog4VFB65UVUqJIV5iiw-FHOqyNZGY" -o patienten_daten.csv
+
+curl -X GET "http://localhost/therapy/lokale" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNTY3NzQ3LCJleHAiOjE3MDA1NzEzNDcsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCIsInVzZXJJZCI6MX19.R3GTpVc4ihXPNZog4VFB65UVUqJIV5iiw-FHOqyNZGY"
+
+curl -X GET "http://localhost/therapy/systemtherapie" \
+     -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiaWF0IjoxNzAwNTY3NzQ3LCJleHAiOjE3MDA1NzEzNDcsImRhdGEiOnsiZW1haWwiOiJhbGVzc2lvLmNhcmNhdmFsbG9AcHIyNC5jaCIsInVzZXJJZCI6MX19.R3GTpVc4ihXPNZog4VFB65UVUqJIV5iiw-FHOqyNZGY"
