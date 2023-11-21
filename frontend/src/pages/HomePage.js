@@ -38,7 +38,6 @@ const HomePage = () => {
       if (response.data.status === 'success' && response.data.token) {
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('token', response.data.token);
-        console.log(response);
         navigate('/dashboard');
       } else {
         setLoginError(

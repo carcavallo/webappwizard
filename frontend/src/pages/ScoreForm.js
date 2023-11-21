@@ -42,7 +42,6 @@ const ScoreForm = () => {
         Authorization: `Bearer ${token}`,
       };
       const payload = { patient_id: patientId, ...scoreData };
-      console.log('Sending score data to /api/score:', payload);
       await axios.post('http://localhost/api/score', payload, { headers });
       navigate(`/patient/${patientId}/score/display`);
     } catch (error) {

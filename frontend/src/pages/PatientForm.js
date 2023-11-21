@@ -116,7 +116,6 @@ const PatientForm = () => {
 
   const updateTherapieData = async (patientId, therapieData, endpoint) => {
     const token = localStorage.getItem('token');
-    console.log(`Sending request to /${endpoint}/${patientId}`, therapieData);
     await axios.post(
       `http://localhost/api/${endpoint}/${patientId}`,
       therapieData,
@@ -149,7 +148,6 @@ const PatientForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      console.log('Sending patient payload to /api/patient:', patientPayload);
       const createResponse = await axios.post(
         'http://localhost/api/patient',
         patientPayload,
@@ -177,11 +175,6 @@ const PatientForm = () => {
           lokaleTherapie: lokaleTherapieIds,
           systemtherapie: systemtherapieIds,
         };
-
-        console.log(
-          `Processing therapy options for endpoint /${endpoint}`,
-          therapieData
-        );
 
         if (lokaleTherapieIds.length > 0 || systemtherapieIds.length > 0) {
           await updateTherapieData(patientId, therapieData, endpoint);
