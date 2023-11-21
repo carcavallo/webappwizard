@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const ScoreForm = () => {
   const navigate = useNavigate();
+  const { id: patientId } = useParams();
   const [scoreData, setScoreData] = useState({
     criteria_1: null, criteria_2: null, criteria_3: null, criteria_4: null,
     criteria_5: null, criteria_6: null, criteria_7: null, criteria_8: null,
@@ -13,17 +14,29 @@ const ScoreForm = () => {
   });
 
   const handleChange = (e) => {
-    setScoreData({ ...scoreData, [e.target.name]: e.target.value });
+    const value = e.target.value === 'yes' ? 1 : 0;
+    setScoreData({ ...scoreData, [e.target.name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/score', scoreData);
-      navigate.push('/score-display');
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      };
+      const payload = { patient_id: patientId, ...scoreData };
+      console.log("Sending score data to /api/score:", payload); 
+      await axios.post('http://localhost/api/score', payload, { headers });
+      navigate(`/patient/${patientId}/score/display`);
     } catch (error) {
       console.error(error);
     }
+  };
+  
+  const handleBack = () => {
+    navigate(-1);
   };
 
   const renderCriteria = (number, question) => (
@@ -80,7 +93,8 @@ const ScoreForm = () => {
             </table>
           </div>
         </div>
-        <button type="submit" className="btn btn-primary mb-3">Berechnen</button>
+        <button type="submit" className="btn btn-primary mb-3">Berechnen</button><br />
+        <button type="button" className="btn btn-secondary mb-3" onClick={handleBack}>Zurück</button>
       </form>
     </div>
   );

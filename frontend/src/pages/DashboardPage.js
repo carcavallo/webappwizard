@@ -34,19 +34,30 @@ const DashboardPage = () => {
     navigate('/');
   };
 
+  const handlePatientClick = (patientId) => {
+    navigate(`/patient/${patientId}/score`);
+  };
+
   return (
     <div className="container mt-5">
       <h1>Patientenliste</h1>
       {patients.length > 0 ? (
-        <ul>
+        <ul className="list-group">
           {patients.map((patient, index) => (
-            <li key={index}>{patient.name} - {patient.details}</li>
+            <li
+              key={index}
+              className="list-group-item list-group-item-action"
+              onClick={() => handlePatientClick(patient.id)}
+              style={{ cursor: 'pointer' }}
+            >
+              {patient.patient_id}
+            </li>
           ))}
         </ul>
       ) : (
         <p>Es wurden noch keine Patienten erfasst.</p>
       )}
-      <button onClick={handleAddPatient} className="btn btn-primary">Patienten registrieren</button><br />
+      <button onClick={handleAddPatient} className="btn btn-primary mt-3">Patienten registrieren</button><br />
       <button onClick={handleLogout} className="btn btn-secondary mt-3">Logout</button>
     </div>
   );

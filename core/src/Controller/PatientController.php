@@ -33,8 +33,6 @@ class PatientController {
 
         $patientId = $this->patientModel->createPatient($patientData);
         if ($patientId) {
-            $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
-            $systemTherapieIds = $request['systemtherapie'] ?? [];
             return ['status' => 'success', 'message' => 'Patient creation successful', 'patientId' => $patientId];
         } else {
             return ['status' => 'error', 'message' => 'Patient creation failed'];
@@ -62,6 +60,10 @@ class PatientController {
             'vermutete_diagnose' => $request['vermutete_diagnose'] ?? null,
             'histopathologische_untersuchung' => $request['histopathologische_untersuchung'] ?? null,
             'histopathologie_ergebnis' => $request['histopathologie_ergebnis'] ?? null,
+            'bisherige_lokaltherapie_sonstiges' => $request['bisherige_lokaltherapie_sonstiges'] ?? null,
+            'bisherige_systemtherapie_sonstiges' => $request['bisherige_systemtherapie_sonstiges'] ?? null,
+            'aktuelle_lokaltherapie_sonstiges' => $request['aktuelle_lokaltherapie_sonstiges'] ?? null,
+            'aktuelle_systemtherapie_sonstiges' => $request['aktuelle_systemtherapie_sonstiges'] ?? null,
             'jucken_letzte_24_stunden' => $request['jucken_letzte_24_stunden'] ?? null,
         ];
         return $patientData;
@@ -93,8 +95,6 @@ class PatientController {
         $patientData = $this->preparePatientData($request);
 
         if ($this->patientModel->updatePatient($patientId, $patientData)) {
-            $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
-            $systemTherapieIds = $request['systemtherapie'] ?? [];
             return ['status' => 'success', 'message' => 'Patient update successful'];
         } else {
             return ['status' => 'error', 'message' => 'Patient update failed'];

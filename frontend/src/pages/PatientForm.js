@@ -61,29 +61,29 @@ const PatientForm = () => {
 
     fetchTherapyOptions();
   }, []);
-  
+
   const handleChange = (e) => {
     setPatientData({ ...patientData, [e.target.name]: e.target.value });
   };
-  
+
   const handleCheckboxChange = (optionType, optionId, isAktuelle = false) => {
     const therapyOptionsToUpdate = isAktuelle ? aktuelleTherapie : bisherigeTherapie;
     const updatedTherapyOptions = { ...therapyOptionsToUpdate };
-  
+
     const selectedOption = updatedTherapyOptions[optionType].find(
       (option) => option.id === optionId
     );
     if (selectedOption) {
       selectedOption.selected = !selectedOption.selected;
     }
-  
+
     if (isAktuelle) {
       setAktuelleTherapie(updatedTherapyOptions);
     } else {
       setBisherigeTherapie(updatedTherapyOptions);
     }
   };
-  
+
   const validateForm = () => {
     for (const [key, value] of Object.entries(patientData)) {
       if (key === 'histopathologie_ergebnis' && patientData.histopathologische_untersuchung !== 'Ja') {
@@ -97,9 +97,10 @@ const PatientForm = () => {
     setError('');
     return true;
   };
-  
+
   const updateTherapieData = async (patientId, therapieData, endpoint) => {
     const token = localStorage.getItem('token');
+    console.log(`Sending request to /${endpoint}/${patientId}`, therapieData); // Add this line
     await axios.post(`http://localhost/api/${endpoint}/${patientId}`, therapieData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -107,41 +108,48 @@ const PatientForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!validateForm()) {
       return;
     }
-
+  
     const doctorId = localStorage.getItem('userId');
     const patientPayload = {
       ...patientData,
       doctor_id: doctorId,
+      bisherige_lokaltherapie_sonstiges: bisherigeTherapieSonstiges.lokaleTherapie,
+      bisherige_systemtherapie_sonstiges: bisherigeTherapieSonstiges.systemtherapie,
+      aktuelle_lokaltherapie_sonstiges: aktuelleTherapieSonstiges.lokaleTherapie,
+      aktuelle_systemtherapie_sonstiges: aktuelleTherapieSonstiges.systemtherapie,
     };
-
+  
     try {
       const token = localStorage.getItem('token');
+      console.log("Sending patient payload to /api/patient:", patientPayload); // Log the final payload
       const createResponse = await axios.post('http://localhost/api/patient', patientPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const patientId = createResponse.data.patientId;
 
-      const processTherapieOptions = async (therapyOptions, sonstiges, endpoint) => {
-        const selectedTherapieIds = therapyOptions.filter(option => option.selected).map(option => option.id);
-        const sonstigesData = therapyOptions.find(option => option.option_name === 'Sonstiges' && option.selected)?.option_name === 'Sonstiges' ? sonstiges : '';
-
-        if (selectedTherapieIds.length > 0 || sonstigesData) {
-          await updateTherapieData(patientId, {
-            therapie_ids: selectedTherapieIds,
-            sonstiges: sonstigesData
-          }, endpoint);
+      const processTherapieOptions = async (lokaleTherapie, systemtherapie, patientId, endpoint) => {
+        const lokaleTherapieIds = lokaleTherapie.filter(option => option.selected).map(option => option.id);
+        const systemtherapieIds = systemtherapie.filter(option => option.selected).map(option => option.id);
+      
+        const therapieData = {
+          lokaleTherapie: lokaleTherapieIds,
+          systemtherapie: systemtherapieIds,
+        };
+      
+        console.log(`Processing therapy options for endpoint /${endpoint}`, therapieData); // Log the request body
+      
+        if (lokaleTherapieIds.length > 0 || systemtherapieIds.length > 0) {
+          await updateTherapieData(patientId, therapieData, endpoint);
         }
       };
 
-      await processTherapieOptions(bisherigeTherapie.lokaleTherapie, bisherigeTherapieSonstiges.lokaleTherapie, 'patient-bisherige-therapien');
-      await processTherapieOptions(bisherigeTherapie.systemtherapie, bisherigeTherapieSonstiges.systemtherapie, 'patient-bisherige-therapien');
-      await processTherapieOptions(aktuelleTherapie.lokaleTherapie, aktuelleTherapieSonstiges.lokaleTherapie, 'patient-aktuelle-therapien');
-      await processTherapieOptions(aktuelleTherapie.systemtherapie, aktuelleTherapieSonstiges.systemtherapie, 'patient-aktuelle-therapien');
+      await processTherapieOptions(bisherigeTherapie.lokaleTherapie, bisherigeTherapie.systemtherapie, patientId, 'patient-bisherige-therapien');
+      await processTherapieOptions(aktuelleTherapie.lokaleTherapie, aktuelleTherapie.systemtherapie, patientId, 'patient-aktuelle-therapien');
 
       navigate('/dashboard');
     } catch (error) {
@@ -200,133 +208,157 @@ const PatientForm = () => {
           </div>
         )}
   
-        <div className="form-group mb-3">
-          <label htmlFor="bisherige_lokaltherapie">Bisherige lokale Therapie</label>
-          {bisherigeTherapie.lokaleTherapie.map((option) => (
-            <div key={option.id} className="form-check">
+      <div className="form-group mb-3">
+            <label htmlFor="bisherige_lokaltherapie">Bisherige lokale Therapie</label>
+            {bisherigeTherapie.lokaleTherapie.map((option) => (
+              <div key={option.id} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`bisherige_lokaltherapie_${option.id}`}
+                  checked={option.selected}
+                  onChange={() => handleCheckboxChange('lokaleTherapie', option.id)}
+                />
+                <label className="form-check-label" htmlFor={`bisherige_lokaltherapie_${option.id}`}>
+                  {option.option_name}
+                </label>
+              </div>
+            ))}
+            <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id={`bisherige_lokaltherapie_${option.id}`}
-                checked={option.selected}
-                onChange={() => handleCheckboxChange('lokaleTherapie', option.id)}
+                id="bisherige_lokaltherapie_sonstiges_checkbox"
+                onChange={(e) => setBisherigeTherapieSonstiges({ ...bisherigeTherapieSonstiges, showLokale: e.target.checked })}
               />
-              <label className="form-check-label" htmlFor={`bisherige_lokaltherapie_${option.id}`}>
-                {option.option_name}
+              <label className="form-check-label" htmlFor="bisherige_lokaltherapie_sonstiges_checkbox">
+                Sonstiges
               </label>
-              {option.option_name === 'Sonstiges' && option.selected && (
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Sonstiges"
-                  value={bisherigeTherapieSonstiges.lokaleTherapie}
-                  onChange={(e) =>
-                    setBisherigeTherapieSonstiges({
-                      ...bisherigeTherapieSonstiges,
-                      lokaleTherapie: e.target.value,
-                    })
-                  }
-                />
-              )}
             </div>
-          ))}
-        </div>
+            {bisherigeTherapieSonstiges.showLokale && (
+              <input
+                type="text"
+                className="form-control mt-2"
+                placeholder="Sonstiges"
+                value={bisherigeTherapieSonstiges.lokaleTherapie}
+                onChange={(e) => setBisherigeTherapieSonstiges({ ...bisherigeTherapieSonstiges, lokaleTherapie: e.target.value })}
+              />
+            )}
+          </div>
   
-        <div className="form-group mb-3">
-          <label htmlFor="bisherige_systemtherapie">Bisherige systemische Therapie</label>
-          {bisherigeTherapie.systemtherapie.map((option) => (
-            <div key={option.id} className="form-check">
+          <div className="form-group mb-3">
+            <label htmlFor="bisherige_systemtherapie">Bisherige systemische Therapie</label>
+            {bisherigeTherapie.systemtherapie.map((option) => (
+              <div key={option.id} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`bisherige_systemtherapie_${option.id}`}
+                  checked={option.selected}
+                  onChange={() => handleCheckboxChange('systemtherapie', option.id)}
+                />
+                <label className="form-check-label" htmlFor={`bisherige_systemtherapie_${option.id}`}>
+                  {option.option_name}
+                </label>
+              </div>
+            ))}
+            <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id={`bisherige_systemtherapie_${option.id}`}
-                checked={option.selected}
-                onChange={() => handleCheckboxChange('systemtherapie', option.id)}
+                id="bisherige_systemtherapie_sonstiges_checkbox"
+                onChange={(e) => setBisherigeTherapieSonstiges({ ...bisherigeTherapieSonstiges, showSystem: e.target.checked })}
               />
-              <label className="form-check-label" htmlFor={`bisherige_systemtherapie_${option.id}`}>
-                {option.option_name}
+              <label className="form-check-label" htmlFor="bisherige_systemtherapie_sonstiges_checkbox">
+                Sonstiges
               </label>
-              {option.option_name === 'Sonstiges' && option.selected && (
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Sonstiges"
-                  value={bisherigeTherapieSonstiges.systemtherapie}
-                  onChange={(e) =>
-                    setBisherigeTherapieSonstiges({
-                      ...bisherigeTherapieSonstiges,
-                      systemtherapie: e.target.value,
-                    })
-                  }
-                />
-              )}
             </div>
-          ))}
-        </div>
+            {bisherigeTherapieSonstiges.showSystem && (
+              <input
+                type="text"
+                className="form-control mt-2"
+                placeholder="Sonstiges"
+                value={bisherigeTherapieSonstiges.systemtherapie}
+                onChange={(e) => setBisherigeTherapieSonstiges({ ...bisherigeTherapieSonstiges, systemtherapie: e.target.value })}
+              />
+            )}
+          </div>
   
-        <div className="form-group mb-3">
-          <label htmlFor="aktuelle_lokaltherapie">Aktuelle lokale Therapie</label>
-          {aktuelleTherapie.lokaleTherapie.map((option) => (
-            <div key={option.id} className="form-check">
+          <div className="form-group mb-3">
+            <label htmlFor="aktuelle_lokaltherapie">Aktuelle lokale Therapie</label>
+            {aktuelleTherapie.lokaleTherapie.map((option) => (
+              <div key={option.id} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`aktuelle_lokaltherapie_${option.id}`}
+                  checked={option.selected}
+                  onChange={() => handleCheckboxChange('lokaleTherapie', option.id, true)}
+                />
+                <label className="form-check-label" htmlFor={`aktuelle_lokaltherapie_${option.id}`}>
+                  {option.option_name}
+                </label>
+              </div>
+            ))}
+            <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id={`aktuelle_lokaltherapie_${option.id}`}
-                checked={option.selected}
-                onChange={() => handleCheckboxChange('lokaleTherapie', option.id, true)}
+                id="aktuelle_lokaltherapie_sonstiges_checkbox"
+                onChange={(e) => setAktuelleTherapieSonstiges({ ...aktuelleTherapieSonstiges, showLokale: e.target.checked })}
               />
-              <label className="form-check-label" htmlFor={`aktuelle_lokaltherapie_${option.id}`}>
-                {option.option_name}
+              <label className="form-check-label" htmlFor="aktuelle_lokaltherapie_sonstiges_checkbox">
+                Sonstiges
               </label>
-              {option.option_name === 'Sonstiges' && option.selected && (
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Sonstiges"
-                  value={aktuelleTherapieSonstiges.lokaleTherapie}
-                  onChange={(e) =>
-                    setAktuelleTherapieSonstiges({
-                      ...aktuelleTherapieSonstiges,
-                      lokaleTherapie: e.target.value,
-                    })
-                  }
-                />
-              )}
             </div>
-          ))}
-        </div>
-  
-        <div className="form-group mb-3">
-          <label htmlFor="aktuelle_systemtherapie">Aktuelle systemische Therapie</label>
-          {aktuelleTherapie.systemtherapie.map((option) => (
-            <div key={option.id} className="form-check">
+            {aktuelleTherapieSonstiges.showLokale && (
+              <input
+                type="text"
+                className="form-control mt-2"
+                placeholder="Sonstiges"
+                value={aktuelleTherapieSonstiges.lokaleTherapie}
+                onChange={(e) => setAktuelleTherapieSonstiges({ ...aktuelleTherapieSonstiges, lokaleTherapie: e.target.value })}
+              />
+            )}
+          </div>
+
+          <div className="form-group mb-3">
+            <label htmlFor="aktuelle_systemtherapie">Aktuelle systemische Therapie</label>
+            {aktuelleTherapie.systemtherapie.map((option) => (
+              <div key={option.id} className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`aktuelle_systemtherapie_${option.id}`}
+                  checked={option.selected}
+                  onChange={() => handleCheckboxChange('systemtherapie', option.id, true)}
+                />
+                <label className="form-check-label" htmlFor={`aktuelle_systemtherapie_${option.id}`}>
+                  {option.option_name}
+                </label>
+              </div>
+            ))}
+            <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id={`aktuelle_systemtherapie_${option.id}`}
-                checked={option.selected}
-                onChange={() => handleCheckboxChange('systemtherapie', option.id, true)}
+                id="aktuelle_systemtherapie_sonstiges_checkbox"
+                onChange={(e) => setAktuelleTherapieSonstiges({ ...aktuelleTherapieSonstiges, showSystem: e.target.checked })}
               />
-              <label className="form-check-label" htmlFor={`aktuelle_systemtherapie_${option.id}`}>
-                {option.option_name}
+              <label className="form-check-label" htmlFor="aktuelle_systemtherapie_sonstiges_checkbox">
+                Sonstiges
               </label>
-              {option.option_name === 'Sonstiges' && option.selected && (
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Sonstiges"
-                  value={aktuelleTherapieSonstiges.systemtherapie}
-                  onChange={(e) =>
-                    setAktuelleTherapieSonstiges({
-                      ...aktuelleTherapieSonstiges,
-                      systemtherapie: e.target.value,
-                    })
-                  }
-                />
-              )}
             </div>
-          ))}
-        </div>
+            {aktuelleTherapieSonstiges.showSystem && (
+              <input
+                type="text"
+                className="form-control mt-2"
+                placeholder="Sonstiges"
+                value={aktuelleTherapieSonstiges.systemtherapie}
+                onChange={(e) => setAktuelleTherapieSonstiges({ ...aktuelleTherapieSonstiges, systemtherapie: e.target.value })}
+              />
+            )}
+          </div>
 
         <div className="form-group mb-3">
           <label htmlFor="jucken_letzte_24_stunden">Jucken in den letzten 24 Stunden</label>

@@ -41,6 +41,10 @@ CREATE TABLE `patients` (
   `vermutete_diagnose` ENUM('AD', 'Psoriasis', 'Flip-Flop') NOT NULL,
   `histopathologische_untersuchung` ENUM('Ja', 'Nein') NOT NULL,
   `histopathologie_ergebnis` TEXT,
+  `bisherige_lokaltherapie_sonstiges` TEXT,
+  `bisherige_systemtherapie_sonstiges` TEXT,
+  `aktuelle_lokaltherapie_sonstiges` TEXT,
+  `aktuelle_systemtherapie_sonstiges` TEXT,
   `jucken_letzte_24_stunden` TINYINT NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`id`)
@@ -64,7 +68,6 @@ CREATE TABLE `patient_bisherige_lokale_therapie` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `patient_id` INT NOT NULL,
   `therapie_id` INT NOT NULL,
-  `sonstiges` TEXT,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`),
   FOREIGN KEY (`therapie_id`) REFERENCES `lokale_therapie_optionen`(`id`)
@@ -74,7 +77,6 @@ CREATE TABLE `patient_bisherige_systemtherapie` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `patient_id` INT NOT NULL,
   `therapie_id` INT NOT NULL,
-  `sonstiges` TEXT,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`),
   FOREIGN KEY (`therapie_id`) REFERENCES `systemtherapie_optionen`(`id`)
@@ -85,7 +87,6 @@ CREATE TABLE `patient_aktuelle_lokale_therapie` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `patient_id` INT NOT NULL,
   `therapie_id` INT NOT NULL,
-  `sonstiges` TEXT,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`),
   FOREIGN KEY (`therapie_id`) REFERENCES `lokale_therapie_optionen`(`id`)
@@ -95,7 +96,6 @@ CREATE TABLE `patient_aktuelle_systemtherapie` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `patient_id` INT NOT NULL,
   `therapie_id` INT NOT NULL,
-  `sonstiges` TEXT,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`),
   FOREIGN KEY (`therapie_id`) REFERENCES `systemtherapie_optionen`(`id`)
