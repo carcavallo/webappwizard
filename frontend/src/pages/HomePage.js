@@ -96,7 +96,7 @@ const HomePage = () => {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-link">
               Login
             </button>
           </form>

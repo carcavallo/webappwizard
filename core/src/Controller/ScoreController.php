@@ -44,8 +44,10 @@ class ScoreController {
             }
         }
         
-    
-        if ($this->scoreModel->insertNewScoreRecord($patientId, $request, $totalScore)) {
+        $insertResult = $this->scoreModel->insertNewScoreRecord($patientId, $request, $totalScore);
+        if ($insertResult && $allCriteriaSet) {
+            $lastInsertedScoreId = $this->db->lastInsertId();
+            $this->scoreModel->setScoreSaved($lastInsertedScoreId);
             return ['status' => 'success', 'message' => 'Score calculated and record inserted', 'score' => $totalScore];
         } else {
             return ['status' => 'error', 'message' => 'Failed to insert score record'];
@@ -80,13 +82,27 @@ class ScoreController {
             return ['status' => 'error', 'message' => 'Invalid input data'];
         }
     
+        $allCriteriaSet = true;
+        for ($i = 1; $i <= 20; $i++) {
+            $criteriaKey = 'criteria_' . $i;
+            if (!isset($data[$criteriaKey]) || $data[$criteriaKey] === NULL) {
+                $allCriteriaSet = false;
+                break;
+            }
+        }
+    
         $updateResult = $this->scoreModel->updateScoreRecord($scoreId, $data);
+        if ($updateResult && $allCriteriaSet) {
+            $this->scoreModel->setScoreSaved($scoreId);
+        }
+    
         if ($updateResult) {
             return ['status' => 'success', 'message' => 'Score updated successfully'];
         } else {
             return ['status' => 'error', 'message' => 'Failed to update score record'];
         }
     }
+    
     
     /**
      * Deletes a score record.

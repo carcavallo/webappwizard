@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import NavBar from '../components/Navigation';
 
 const ScoreForm = () => {
   const navigate = useNavigate();
@@ -27,14 +28,16 @@ const ScoreForm = () => {
     criteria_19: null,
     criteria_20: null,
   });
-
   const handleChange = e => {
     const value = e.target.value === 'yes' ? 1 : 0;
     setScoreData({ ...scoreData, [e.target.name]: value });
   };
+  const handleIntermediateSave = () => {
+    handleSubmit(null, true); // Pass true for isIntermediateSave
+  };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const handleSubmit = async (e, isIntermediateSave = false) => {
+    if (e) e.preventDefault(); // Prevent form submission if e is not null
     try {
       const token = localStorage.getItem('token');
       const headers = {
@@ -43,7 +46,12 @@ const ScoreForm = () => {
       };
       const payload = { patient_id: patientId, ...scoreData };
       await axios.post('http://localhost/api/score', payload, { headers });
-      navigate(`/patient/${patientId}/score/display`);
+
+      if (isIntermediateSave) {
+        navigate('/dashboard');
+      } else {
+        navigate(`/patient/${patientId}/score/display`);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -80,109 +88,119 @@ const ScoreForm = () => {
   );
 
   return (
-    <div className="container mt-5">
-      <h1 className="mb-4">Flip-Flop-Score Formular</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="row">
-          <div className="col-md-6">
-            <h2>Anamnesekriterien</h2>
-            <table className="table">
-              <tbody>
-                {renderCriteria(
-                  1,
-                  '(1) Positive Eigenanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis)'
-                )}
-                {renderCriteria(
-                  2,
-                  '(2) Bek. Sensibilisierungen und/oder Nahrungsmittelunverträglichkeiten'
-                )}
-                {renderCriteria(
-                  3,
-                  '(3) Positive Familienanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis, „Ekzeme“)'
-                )}
-                {renderCriteria(
-                  4,
-                  '(4) Positive Familienanamnese für Psoriasis'
-                )}
-                {renderCriteria(
-                  5,
-                  '(5) Abrupte Exazerbation nach Absetzen einer systemischen Steroidtherapie'
-                )}
-                {renderCriteria(6, '(6) Gelenkschmerzen')}
-                {renderCriteria(
-                  7,
-                  '(7) Daktylitis und/oder Enthesiopathien (v.a. im Bereich der Achillessehne)'
-                )}
-              </tbody>
-            </table>
+    <>
+      <NavBar />
+      <div className="container mt-5">
+        <h1 className="mb-4">Flip-Flop-Score Formular</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="row">
+            <div className="col-md-6">
+              <h2>Anamnesekriterien</h2>
+              <table className="table">
+                <tbody>
+                  {renderCriteria(
+                    1,
+                    '(1) Positive Eigenanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis)'
+                  )}
+                  {renderCriteria(
+                    2,
+                    '(2) Bek. Sensibilisierungen und/oder Nahrungsmittelunverträglichkeiten'
+                  )}
+                  {renderCriteria(
+                    3,
+                    '(3) Positive Familienanamnese für Atopie (Vorliegen von min. 1 Erkrankung: Asthma, AD, allergische Rhinitis, allergische Konjunktivitis, „Ekzeme“)'
+                  )}
+                  {renderCriteria(
+                    4,
+                    '(4) Positive Familienanamnese für Psoriasis'
+                  )}
+                  {renderCriteria(
+                    5,
+                    '(5) Abrupte Exazerbation nach Absetzen einer systemischen Steroidtherapie'
+                  )}
+                  {renderCriteria(6, '(6) Gelenkschmerzen')}
+                  {renderCriteria(
+                    7,
+                    '(7) Daktylitis und/oder Enthesiopathien (v.a. im Bereich der Achillessehne)'
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="col-md-6">
+              <h2>Untersuchungskriterien</h2>
+              <table className="table">
+                <tbody>
+                  {renderCriteria(
+                    8,
+                    '(8) Dishydrosis (aktuell oder in der Vergangenheit)'
+                  )}
+                  {renderCriteria(
+                    9,
+                    '(9) Pusteln (aktuell oder in der Vergangenheit; ausser im Gesicht)'
+                  )}
+                  {renderCriteria(
+                    10,
+                    '(10) Psoriasis-typische Nagelveränderungen (Tüpfel, Ölfleck, Dystrophie)'
+                  )}
+                  {renderCriteria(11, '(11) Palmare Hyperlinearität')}
+                  {renderCriteria(
+                    12,
+                    '(12) Kopfhautbefall vom Capillitium über die Stirn-Haargrenze hinaus'
+                  )}
+                  {renderCriteria(
+                    13,
+                    '(13) Dennie-Morgan-Falte u./od. periorbitale Verschattung u./od. halonierte Augen'
+                  )}
+                  {renderCriteria(
+                    14,
+                    '(14) Perlèche u./od. Cheilitis (aktuell oder in der Vergangenheit)'
+                  )}
+                  {renderCriteria(
+                    15,
+                    '(15) Plaques-Befall der Retroaurikulärregion'
+                  )}
+                  {renderCriteria(
+                    16,
+                    '(16) Head Neck Dermatitis oder Dirty neck'
+                  )}
+                  {renderCriteria(17, '(17) Keratosis pilaris')}
+                  {renderCriteria(
+                    18,
+                    '(18) Erythematosquamöse Plaques an Körper u./od. Extremitäten (aktuell oder in der Vergangenheit)'
+                  )}
+                  {renderCriteria(
+                    19,
+                    '(19) Ekzeme u./od. Lichenifizierung der Beugen (aktuell oder in der Vergangenheit)'
+                  )}
+                  {renderCriteria(
+                    20,
+                    '(20) Befall der Rima ani (Erythem und/oder Mazeration)'
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div className="col-md-6">
-            <h2>Untersuchungskriterien</h2>
-            <table className="table">
-              <tbody>
-                {renderCriteria(
-                  8,
-                  '(8) Dishydrosis (aktuell oder in der Vergangenheit)'
-                )}
-                {renderCriteria(
-                  9,
-                  '(9) Pusteln (aktuell oder in der Vergangenheit; ausser im Gesicht)'
-                )}
-                {renderCriteria(
-                  10,
-                  '(10) Psoriasis-typische Nagelveränderungen (Tüpfel, Ölfleck, Dystrophie)'
-                )}
-                {renderCriteria(11, '(11) Palmare Hyperlinearität')}
-                {renderCriteria(
-                  12,
-                  '(12) Kopfhautbefall vom Capillitium über die Stirn-Haargrenze hinaus'
-                )}
-                {renderCriteria(
-                  13,
-                  '(13) Dennie-Morgan-Falte u./od. periorbitale Verschattung u./od. halonierte Augen'
-                )}
-                {renderCriteria(
-                  14,
-                  '(14) Perlèche u./od. Cheilitis (aktuell oder in der Vergangenheit)'
-                )}
-                {renderCriteria(
-                  15,
-                  '(15) Plaques-Befall der Retroaurikulärregion'
-                )}
-                {renderCriteria(
-                  16,
-                  '(16) Head Neck Dermatitis oder Dirty neck'
-                )}
-                {renderCriteria(17, '(17) Keratosis pilaris')}
-                {renderCriteria(
-                  18,
-                  '(18) Erythematosquamöse Plaques an Körper u./od. Extremitäten (aktuell oder in der Vergangenheit)'
-                )}
-                {renderCriteria(
-                  19,
-                  '(19) Ekzeme u./od. Lichenifizierung der Beugen (aktuell oder in der Vergangenheit)'
-                )}
-                {renderCriteria(
-                  20,
-                  '(20) Befall der Rima ani (Erythem und/oder Mazeration)'
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <button type="submit" className="btn btn-primary mb-3">
-          Berechnen
-        </button>
-        <br />
-        <button
-          type="button"
-          className="btn btn-secondary mb-3"
-          onClick={handleBack}
-        >
-          Zurück
-        </button>
-      </form>
-    </div>
+          <button type="submit" className="btn btn-link mb-3">
+            Berechnen
+          </button>
+          <button
+            type="button"
+            className="btn btn-link mb-3"
+            onClick={handleIntermediateSave}
+          >
+            Zwischenspeichern
+          </button>
+          <br />
+          <button
+            type="button"
+            className="btn btn-link mb-3"
+            onClick={handleBack}
+          >
+            Zurück
+          </button>
+        </form>
+      </div>
+    </>
   );
 };
 

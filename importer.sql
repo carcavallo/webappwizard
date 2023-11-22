@@ -46,6 +46,7 @@ CREATE TABLE `patients` (
   `aktuelle_lokaltherapie_sonstiges` TEXT,
   `aktuelle_systemtherapie_sonstiges` TEXT,
   `jucken_letzte_24_stunden` TINYINT NOT NULL,
+  `saved` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -127,6 +128,7 @@ CREATE TABLE `patient_scores` (
   `criteria_19` BOOLEAN,
   `criteria_20` BOOLEAN,
   `total_score` DECIMAL(5,2),
+  `saved` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

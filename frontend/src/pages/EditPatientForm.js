@@ -149,7 +149,7 @@ const PatientForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const createResponse = await axios.post(
+      const createResponse = await axios.put(
         'http://localhost/api/patient',
         patientPayload,
         {
@@ -205,7 +205,7 @@ const PatientForm = () => {
     <>
       <NavBar />
       <div className="container mt-5">
-        <h1>Patienten registrieren</h1>
+        <h1>Patienten editieren</h1>
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}

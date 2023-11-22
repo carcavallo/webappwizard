@@ -264,7 +264,7 @@ const RegistrationPage = () => {
           </label>
         </div>
 
-        <button type="submit" className="btn btn-primary mb-3">
+        <button type="submit" className="btn btn-link mb-3">
           Abschicken
         </button>
       </form>

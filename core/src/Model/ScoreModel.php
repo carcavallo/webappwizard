@@ -97,9 +97,24 @@ class ScoreModel {
         $stmt->execute($parameters);
     
         if ($allCriteriaSet) {
-            $this->generateAndSendScoreReport($patientId, $totalScore);
+            $scoreId = $this->db->lastInsertId();
+            $this->setScoreSaved(intval($scoreId));
+            $this->generateAndSendScoreReport($patientId, $totalScore);            
         }
 
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Sets the 'saved' status of a score record to true.
+     *
+     * @param int $scoreId The ID of the score record.
+     * @return bool True on successful update, false on failure.
+     */
+    public function setScoreSaved($scoreId) {
+        $sql = "UPDATE patient_scores SET saved = 1 WHERE id = :score_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':score_id' => $scoreId]);
         return $stmt->rowCount() > 0;
     }
     
