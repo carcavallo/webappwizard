@@ -33,11 +33,11 @@ const ScoreForm = () => {
     setScoreData({ ...scoreData, [e.target.name]: value });
   };
   const handleIntermediateSave = () => {
-    handleSubmit(null, true); // Pass true for isIntermediateSave
+    handleSubmit(null, true);
   };
 
   const handleSubmit = async (e, isIntermediateSave = false) => {
-    if (e) e.preventDefault(); // Prevent form submission if e is not null
+    if (e) e.preventDefault();
     try {
       const token = localStorage.getItem('token');
       const headers = {

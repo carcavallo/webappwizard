@@ -13,7 +13,6 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchPatientsAndScores = async () => {
       try {
-        // Fetch the list of patients first
         const patientsResponse = await axios.get(
           `http://localhost/api/user/${localStorage.getItem(
             'userId'
@@ -22,22 +21,19 @@ const DashboardPage = () => {
         );
 
         if (patientsResponse.data.status === 'success') {
-          // For each patient, fetch their scores
-          const scorePromises = patientsResponse.data.data.map(
-            patient =>
-              axios
-                .get(`http://localhost/api/scores/${patient.id}`, {
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                  },
-                })
-                .catch(error => ({ error })) // Catch individual errors to prevent one failure from blocking the process
+          const scorePromises = patientsResponse.data.data.map(patient =>
+            axios
+              .get(`http://localhost/api/scores/${patient.id}`, {
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+              })
+              .catch(error => ({ error }))
           );
 
           const scoresResponses = await Promise.all(scorePromises);
 
-          // Merge patients with their scores
           const patientsWithScores = patientsResponse.data.data.map(
             (patient, index) => {
               const scoresResponse = scoresResponses[index];
@@ -48,7 +44,6 @@ const DashboardPage = () => {
               ) {
                 return { ...patient, scores: scoresResponse.data.scores };
               } else {
-                // Handle the error or absence of scores
                 return { ...patient, scores: [] };
               }
             }
@@ -91,6 +86,18 @@ const DashboardPage = () => {
     }
   };
 
+  const renderScoreCalculationLink = patient => {
+    if (patient.scores && patient.scores.length >= 4) {
+      return null;
+    }
+
+    return (
+      <Link to={`/patient/${patient.id}/score`} className="btn btn-link">
+        Score berechnen
+      </Link>
+    );
+  };
+
   return (
     <>
       <NavBar />
@@ -126,12 +133,7 @@ const DashboardPage = () => {
                 >
                   Editieren
                 </button>
-                <Link
-                  to={`/patient/${patient.id}/score`}
-                  className="btn btn-link"
-                >
-                  Score berechnen
-                </Link>
+                {renderScoreCalculationLink(patient)}
               </div>
             </li>
           ))}

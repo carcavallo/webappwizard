@@ -7,11 +7,12 @@ import NavBar from '../components/Navigation';
 const ScoreDisplay = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [scores, setScores] = useState([]);
+  const { score_id } = useParams();
+  const [score, setScore] = useState([]);
   const [patientId, setPatientId] = useState('');
 
   useEffect(() => {
-    const fetchScores = async () => {
+    const fetchScore = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(`http://localhost/api/scores/${id}`, {
@@ -21,10 +22,17 @@ const ScoreDisplay = () => {
           },
         });
         if (response.data.status === 'success') {
-          setScores(response.data.scores);
+          const matchedScore = response.data.scores.find(
+            s => s.id === parseInt(score_id)
+          );
+          if (matchedScore) {
+            setScore(matchedScore);
+          } else {
+            console.log('No score found with the provided score ID');
+          }
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching scores:', error);
       }
     };
 
@@ -37,7 +45,6 @@ const ScoreDisplay = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
         if (response.data.status === 'success') {
           setPatientId(response.data.patientData.patient_id);
         }
@@ -46,7 +53,7 @@ const ScoreDisplay = () => {
       }
     };
 
-    fetchScores();
+    fetchScore();
     fetchPatientInfo();
   }, [id]);
 
@@ -59,49 +66,47 @@ const ScoreDisplay = () => {
     const scoreOffset = (100 * (parseFloat(score) + maxScore)) / (2 * maxScore);
     return scoreOffset;
   };
+  console.log(score);
 
   return (
     <>
       <NavBar />
       <div className="container mt-5">
-        <h1 className="mb-5">Berrechneter Score für Patient: {patientId}</h1>
-        {scores.length > 0 ? (
+        <h1 className="mb-5">Berechneter Score für Patient: {patientId}</h1>
+        {score ? (
           <div style={{ position: 'relative', height: '192px' }}>
             <img
               src={scoreScaleImage}
               alt="Score Scale"
               style={{ width: '100%' }}
             />
-            {scores.map((score, index) => (
+            <div
+              style={{
+                position: 'absolute',
+                left: `${getScorePosition(score.total_score)}%`,
+                bottom: '-40px',
+              }}
+            >
               <div
-                key={index}
+                style={{
+                  width: '5px',
+                  height: '89px',
+                  backgroundColor: 'red',
+                }}
+              />
+              <div
                 style={{
                   position: 'absolute',
-                  left: `${getScorePosition(score.total_score)}%`,
-                  bottom: '-40px',
+                  bottom: '90px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  color: 'black',
+                  fontWeight: 'bold',
                 }}
               >
-                <div
-                  style={{
-                    width: '5px',
-                    height: '89px',
-                    backgroundColor: 'red',
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '90px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    color: 'black',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {score.total_score}
-                </div>
+                {score.total_score}
               </div>
-            ))}
+            </div>
             <button
               type="button"
               className="btn btn-link mb-3"
@@ -111,7 +116,7 @@ const ScoreDisplay = () => {
             </button>
           </div>
         ) : (
-          <p>Loading scores...</p>
+          <p>Loading score...</p>
         )}
       </div>
     </>

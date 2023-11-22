@@ -99,7 +99,7 @@ class ScoreModel {
         if ($allCriteriaSet) {
             $scoreId = $this->db->lastInsertId();
             $this->setScoreSaved(intval($scoreId));
-            $this->generateAndSendScoreReport($patientId, $totalScore);            
+            //$this->generateAndSendScoreReport($patientId, $totalScore);            
         }
 
         return $stmt->rowCount() > 0;
@@ -185,7 +185,7 @@ class ScoreModel {
         if ($allCriteriaSet) {
             $patientId = $this->getPatientIdByScoreId($scoreId);
             if ($patientId) {
-                $this->generateAndSendScoreReport($patientId, $totalScore);
+                //$this->generateAndSendScoreReport($patientId, $totalScore);
             }
         }
         return true;

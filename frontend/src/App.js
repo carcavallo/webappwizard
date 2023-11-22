@@ -48,7 +48,7 @@ function App() {
           }
         />
         <Route
-          path="/patient/:id/score/display"
+          path="/patient/:id/score/:score_id/display"
           element={
             <TokenVerification>
               <ScoreDisplay />
