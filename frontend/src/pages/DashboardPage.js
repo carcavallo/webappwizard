@@ -68,6 +68,24 @@ const DashboardPage = () => {
     navigate(`/patient/${patientId}/edit`);
   };
 
+  const handleDeletePatient = async patientId => {
+    try {
+      await axios.delete(`http://localhost/api/patient/${patientId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setPatients(patients.filter(patient => patient.id !== patientId));
+    } catch (error) {
+      console.error('Fehler beim Löschen des Patienten:', error);
+    }
+  };
+
+  const hasSavedScores = patient => {
+    return patient.scores.some(score => score.saved);
+  };
+
   const renderScoreWithIcon = (patientId, score) => {
     if (score.saved) {
       return (
@@ -127,13 +145,21 @@ const DashboardPage = () => {
                 )}
               </div>
               <div className="flex-grow-1 d-flex justify-content-end">
+                {renderScoreCalculationLink(patient)}
                 <button
                   onClick={e => handleEditPatient(e, patient.id)}
                   className="btn btn-link me-2"
                 >
-                  Editieren
+                  Patient Editieren
                 </button>
-                {renderScoreCalculationLink(patient)}
+                {!hasSavedScores(patient) && (
+                  <button
+                    onClick={() => handleDeletePatient(patient.id)}
+                    className="btn btn-link text-danger"
+                  >
+                    Patient Löschen
+                  </button>
+                )}
               </div>
             </li>
           ))}

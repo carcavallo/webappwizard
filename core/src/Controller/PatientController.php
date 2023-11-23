@@ -131,6 +131,24 @@ class PatientController {
         }
     }
 
+    public function getBisherigeTherapien($patientId) {
+        $result = $this->patientModel->getBisherigeTherapien($patientId);
+        if ($result !== false) {
+            return ['status' => 'success', 'data' => $result];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to retrieve Bisherige Therapien'];
+        }
+    }
+
+    public function getAktuelleTherapien($patientId) {
+        $result = $this->patientModel->getAktuelleTherapien($patientId);
+        if ($result !== false) {
+            return ['status' => 'success', 'data' => $result];
+        } else {
+            return ['status' => 'error', 'message' => 'Failed to retrieve Aktuelle Therapien'];
+        }
+    }
+
     public function updateBisherigeTherapien($patientId) {
         $request = json_decode(file_get_contents('php://input'), true);
         $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];

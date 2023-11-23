@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import NavBar from '../components/Navigation';
 
 const PatientForm = () => {
+  const { id: patientId } = useParams();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const [patientData, setPatientData] = useState({
     geburtsdatum: '',
     geschlecht: '',
@@ -23,6 +25,14 @@ const PatientForm = () => {
     lokaleTherapie: [],
     systemtherapie: [],
   });
+  const [bisherigeTherapieValues, setBisherigeTherapieValues] = useState({
+    lokaleTherapie: [],
+    systemtherapie: [],
+  });
+  const [aktuelleTherapieValues, setAktuelleTherapieValues] = useState({
+    lokaleTherapie: [],
+    systemtherapie: [],
+  });
   const [bisherigeTherapieSonstiges, setBisherigeTherapieSonstiges] = useState({
     lokaleTherapie: '',
     systemtherapie: '',
@@ -32,43 +42,181 @@ const PatientForm = () => {
     systemtherapie: '',
   });
 
-  useEffect(() => {
-    const fetchTherapyOptions = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const headers = { Authorization: `Bearer ${token}` };
+  const extractTherapyIds = therapyData => {
+    return therapyData.flatMap(obj => Object.values(obj));
+  };
+  const fetchTherapyOptions = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
 
-        const lokaleResponse = await axios.get(
-          'http://localhost/api/therapy/lokale',
-          { headers }
-        );
-        const systemtherapieResponse = await axios.get(
-          'http://localhost/api/therapy/systemtherapie',
-          { headers }
-        );
+      const lokaleResponse = await axios.get(
+        'http://localhost/api/therapy/lokale',
+        { headers }
+      );
+      const systemtherapieResponse = await axios.get(
+        'http://localhost/api/therapy/systemtherapie',
+        { headers }
+      );
 
-        const mapOptions = options =>
-          options.map(option => ({
-            ...option,
-            selected: false,
-          }));
+      const mapOptions = options =>
+        options.map(option => ({
+          ...option,
+          selected: false,
+        }));
 
-        setBisherigeTherapie({
-          lokaleTherapie: mapOptions(lokaleResponse.data),
-          systemtherapie: mapOptions(systemtherapieResponse.data),
-        });
+      setBisherigeTherapie({
+        lokaleTherapie: mapOptions(lokaleResponse.data),
+        systemtherapie: mapOptions(systemtherapieResponse.data),
+      });
 
-        setAktuelleTherapie({
-          lokaleTherapie: mapOptions(lokaleResponse.data),
-          systemtherapie: mapOptions(systemtherapieResponse.data),
-        });
-      } catch (error) {
-        setError('Error fetching therapy options.');
+      setAktuelleTherapie({
+        lokaleTherapie: mapOptions(lokaleResponse.data),
+        systemtherapie: mapOptions(systemtherapieResponse.data),
+      });
+    } catch (error) {
+      setError('Error fetching therapy options.');
+    }
+  }, []);
+
+  const fetchPatientData = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get(
+        `http://localhost/api/patient/${patientId}`,
+        { headers }
+      );
+      if (response.data) {
+        const { id, patient_id, doctor_id, saved, ...patientDataWithoutIds } =
+          response.data.patientData;
+        setPatientData(patientDataWithoutIds);
       }
+    } catch (error) {
+      setError('Error fetching patient data.');
+    }
+  }, [patientId]);
+
+  const fetchBisherigePatientTherapien = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get(
+        `http://localhost/api/patient-bisherige-therapien/${patientId}`,
+        { headers }
+      );
+      if (response.data.status === 'success') {
+        setBisherigeTherapieValues({
+          lokaleTherapie: response.data.data.lokaleTherapie,
+          systemtherapie: response.data.data.systemtherapie,
+        });
+      }
+    } catch (error) {
+      setError('Error fetching patient bisherige therapien.');
+    }
+  }, [patientId]);
+
+  const fetchAktuellePatientTherapien = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const response = await axios.get(
+        `http://localhost/api/patient-aktuelle-therapien/${patientId}`,
+        { headers }
+      );
+      if (response.data.status === 'success') {
+        setAktuelleTherapieValues({
+          lokaleTherapie: response.data.data.lokaleTherapie,
+          systemtherapie: response.data.data.systemtherapie,
+        });
+      }
+    } catch (error) {
+      setError('Error fetching patient aktuelle therapien.');
+    }
+  }, [patientId]);
+
+  useEffect(() => {
+    const updateTherapiesSelection = (therapyOptions, selectedIds) => {
+      return therapyOptions.map(option => ({
+        ...option,
+        selected: selectedIds.includes(option.id),
+      }));
     };
 
-    fetchTherapyOptions();
-  }, []);
+    if (bisherigeTherapieValues.lokaleTherapie.length > 0) {
+      const selectedIds = extractTherapyIds(
+        bisherigeTherapieValues.lokaleTherapie
+      );
+      setBisherigeTherapie(prevState => ({
+        ...prevState,
+        lokaleTherapie: updateTherapiesSelection(
+          prevState.lokaleTherapie,
+          selectedIds
+        ),
+      }));
+    }
+
+    if (bisherigeTherapieValues.systemtherapie.length > 0) {
+      const selectedIds = extractTherapyIds(
+        bisherigeTherapieValues.systemtherapie
+      );
+      setBisherigeTherapie(prevState => ({
+        ...prevState,
+        systemtherapie: updateTherapiesSelection(
+          prevState.systemtherapie,
+          selectedIds
+        ),
+      }));
+    }
+
+    if (aktuelleTherapieValues.lokaleTherapie.length > 0) {
+      const selectedIds = extractTherapyIds(
+        aktuelleTherapieValues.lokaleTherapie
+      );
+      setAktuelleTherapie(prevState => ({
+        ...prevState,
+        lokaleTherapie: updateTherapiesSelection(
+          prevState.lokaleTherapie,
+          selectedIds
+        ),
+      }));
+    }
+
+    if (aktuelleTherapieValues.systemtherapie.length > 0) {
+      const selectedIds = extractTherapyIds(
+        aktuelleTherapieValues.systemtherapie
+      );
+      setAktuelleTherapie(prevState => ({
+        ...prevState,
+        systemtherapie: updateTherapiesSelection(
+          prevState.systemtherapie,
+          selectedIds
+        ),
+      }));
+    }
+  }, [bisherigeTherapieValues, aktuelleTherapieValues]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchTherapyOptions();
+      await fetchPatientData();
+      await fetchBisherigePatientTherapien();
+      await fetchAktuellePatientTherapien();
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, [
+    patientId,
+    fetchAktuellePatientTherapien,
+    fetchBisherigePatientTherapien,
+    fetchPatientData,
+    fetchTherapyOptions,
+  ]);
 
   const handleChange = e => {
     setPatientData({ ...patientData, [e.target.name]: e.target.value });
@@ -80,12 +228,14 @@ const PatientForm = () => {
       : bisherigeTherapie;
     const updatedTherapyOptions = { ...therapyOptionsToUpdate };
 
-    const selectedOption = updatedTherapyOptions[optionType].find(
-      option => option.id === optionId
+    updatedTherapyOptions[optionType] = updatedTherapyOptions[optionType].map(
+      option => {
+        if (option.id === optionId) {
+          return { ...option, selected: !option.selected };
+        }
+        return option;
+      }
     );
-    if (selectedOption) {
-      selectedOption.selected = !selectedOption.selected;
-    }
 
     if (isAktuelle) {
       setAktuelleTherapie(updatedTherapyOptions);
@@ -101,16 +251,29 @@ const PatientForm = () => {
   const validateForm = () => {
     for (const [key, value] of Object.entries(patientData)) {
       if (
+        [
+          'bisherige_lokaltherapie_sonstiges',
+          'bisherige_systemtherapie_sonstiges',
+          'aktuelle_lokaltherapie_sonstiges',
+          'aktuelle_systemtherapie_sonstiges',
+        ].includes(key)
+      ) {
+        continue;
+      }
+
+      if (
         key === 'histopathologie_ergebnis' &&
         patientData.histopathologische_untersuchung !== 'Ja'
       ) {
         continue;
       }
+
       if (value === '') {
         setError('Bitte füllen Sie alle Felder aus.');
         return false;
       }
     }
+
     setError('');
     return true;
   };
@@ -149,16 +312,14 @@ const PatientForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const createResponse = await axios.put(
-        'http://localhost/api/patient',
+      await axios.put(
+        `http://localhost/api/patient/${patientId}`,
         patientPayload,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      const patientId = createResponse.data.patientId;
-
+      console.log('asd');
       const processTherapieOptions = async (
         lokaleTherapie,
         systemtherapie,
@@ -194,12 +355,15 @@ const PatientForm = () => {
         patientId,
         'patient-aktuelle-therapien'
       );
-
       navigate('/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Ein Fehler ist aufgetreten.');
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>

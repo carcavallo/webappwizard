@@ -34,7 +34,7 @@ const EditScoreForm = () => {
     };
 
     loadScores();
-  }, [patientId]);
+  }, [patientId, scoreId]);
 
   const handleChange = e => {
     const value = e.target.value === 'yes' ? 1 : 0;

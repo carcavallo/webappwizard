@@ -140,6 +140,40 @@ class PatientModel {
         }
     }
 
+    public function getBisherigeTherapien($patientId) {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM patient_bisherige_lokale_therapie WHERE patient_id = :patientId");
+            $stmt->execute(['patientId' => $patientId]);
+            $lokaleTherapie = $stmt->fetchAll();
+
+            $stmt = $this->db->prepare("SELECT * FROM patient_bisherige_systemtherapie WHERE patient_id = :patientId");
+            $stmt->execute(['patientId' => $patientId]);
+            $systemTherapie = $stmt->fetchAll();
+
+            return ['lokaleTherapie' => $lokaleTherapie, 'systemtherapie' => $systemTherapie];
+        } catch (PDOException $e) {
+            error_log("PDOException in getBisherigeTherapien: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getAktuelleTherapien($patientId) {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM patient_aktuelle_lokale_therapie WHERE patient_id = :patientId");
+            $stmt->execute(['patientId' => $patientId]);
+            $lokaleTherapie = $stmt->fetchAll();
+
+            $stmt = $this->db->prepare("SELECT * FROM patient_aktuelle_systemtherapie WHERE patient_id = :patientId");
+            $stmt->execute(['patientId' => $patientId]);
+            $systemTherapie = $stmt->fetchAll();
+
+            return ['lokaleTherapie' => $lokaleTherapie, 'systemtherapie' => $systemTherapie];
+        } catch (PDOException $e) {
+            error_log("PDOException in getAktuelleTherapien: " . $e->getMessage());
+            return false;
+        }
+    }  
+
     public function addBisherigeTherapie($patientId, $therapieIds) {
         return $this->handleTherapieUpdate($patientId, $therapieIds, 'patient_bisherige_lokale_therapie');
     }

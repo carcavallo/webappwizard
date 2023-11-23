@@ -55,7 +55,7 @@ const ScoreDisplay = () => {
 
     fetchScore();
     fetchPatientInfo();
-  }, [id]);
+  }, [id, score_id]);
 
   const handleBack = () => {
     navigate('/dashboard');

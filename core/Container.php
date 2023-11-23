@@ -181,6 +181,16 @@ class Container {
             $response = $patientController->updateAktuelleTherapien($patientId);
             Utils::sendJsonResponse($response);
         });
+        
+        $router->get('/patient-bisherige-therapien/{patientId}', function($patientId) use ($patientController) {
+            $response = $patientController->getBisherigeTherapien($patientId);
+            Utils::sendJsonResponse($response);
+        });
+        
+        $router->get('/patient-aktuelle-therapien/{patientId}', function($patientId) use ($patientController) {
+            $response = $patientController->getAktuelleTherapien($patientId);
+            Utils::sendJsonResponse($response);
+        });        
     }
 
     /**
