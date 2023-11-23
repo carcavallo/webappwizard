@@ -38,7 +38,7 @@ class AdminController {
                 $token = [
                     "iss" => $_ENV['BASEDOMAIN'],
                     "iat" => time(),
-                    "exp" => time() + 3600,
+                    "exp" => time() + 7200,
                     "data" => [
                         "email" => $email
                     ]

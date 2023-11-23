@@ -6,23 +6,6 @@ const TokenVerification = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const refreshToken = async oldToken => {
-      try {
-        const response = await axios.post(
-          'http://localhost/api/auth/refresh-token',
-          { token: oldToken }
-        );
-
-        if (response.status === 200 && response.data.newToken) {
-          localStorage.setItem('token', response.data.newToken);
-          return true;
-        }
-      } catch (error) {
-        console.error('Error refreshing token:', error);
-      }
-      return false;
-    };
-
     const verifyToken = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -31,26 +14,20 @@ const TokenVerification = ({ children }) => {
       }
 
       try {
-        const validationResponse = await axios.post(
+        const response = await axios.post(
           'http://localhost/api/auth/validate-token',
           { token }
         );
 
-        if (
-          validationResponse.status === 200 &&
-          validationResponse.data.valid
-        ) {
+        if (response.status === 200) {
           return;
         } else {
-          const refreshSuccess = await refreshToken(token);
-          if (!refreshSuccess) {
-            localStorage.removeItem('id');
-            localStorage.removeItem('token');
-            navigate('/');
-          }
+          localStorage.removeItem('userId');
+          localStorage.removeItem('token');
+          navigate('/');
         }
       } catch (error) {
-        localStorage.removeItem('id');
+        localStorage.removeItem('userId');
         localStorage.removeItem('token');
         navigate('/');
       }

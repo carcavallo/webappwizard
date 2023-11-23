@@ -8,6 +8,8 @@ import EditScoreForm from './pages/EditScoreForm';
 import ScoreDisplay from './pages/ScoreDisplay';
 import DashboardPage from './pages/DashboardPage';
 import TokenVerification from './components/TokenVerification';
+import AdminPage from './pages/AdminPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -63,6 +65,8 @@ function App() {
             </TokenVerification>
           }
         />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

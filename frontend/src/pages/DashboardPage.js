@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import NavBar from '../components/Navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const DashboardPage = () => {
   const [patients, setPatients] = useState([]);
-  const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -58,15 +57,6 @@ const DashboardPage = () => {
 
     fetchPatientsAndScores();
   }, [token]);
-
-  const handleAddPatient = () => {
-    navigate('/patient');
-  };
-
-  const handleEditPatient = (e, patientId) => {
-    e.stopPropagation();
-    navigate(`/patient/${patientId}/edit`);
-  };
 
   const handleDeletePatient = async patientId => {
     try {
@@ -120,53 +110,53 @@ const DashboardPage = () => {
     <>
       <NavBar />
       <div className="container mt-5">
-        <h1 className="mb-3">Patientenliste</h1>
-        <ul className="list-group">
-          <li className="list-group-item d-flex justify-content-between">
-            <div className="flex-grow-1">
-              <strong>Patienten-ID</strong>
-            </div>
-          </li>
-          {patients.map(patient => (
-            <li
-              key={patient.id}
-              className="list-group-item d-flex justify-content-between"
-            >
-              <div className="flex-grow-1">{patient.patient_id}</div>
-              <div className="flex-grow-1 d-flex justify-content-start">
-                {patient.scores && patient.scores.length > 0 ? (
-                  <div className="d-flex justify-content-start">
-                    {patient.scores.map(score =>
-                      renderScoreWithIcon(patient.id, score)
-                    )}
-                  </div>
-                ) : (
-                  <div>Keine Scores</div>
-                )}
-              </div>
-              <div className="flex-grow-1 d-flex justify-content-end">
-                {renderScoreCalculationLink(patient)}
-                <button
-                  onClick={e => handleEditPatient(e, patient.id)}
-                  className="btn btn-link me-2"
-                >
-                  Patient Editieren
-                </button>
-                {!hasSavedScores(patient) && (
-                  <button
-                    onClick={() => handleDeletePatient(patient.id)}
-                    className="btn btn-link text-danger"
+        <h1 className="mb-4">Patientenliste</h1>
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">Patienten-ID</th>
+              <th scope="col">Scores</th>
+              <th scope="col" className="align-middle ps-4">
+                Aktionen
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {patients.map(patient => (
+              <tr key={patient.id}>
+                <td className="align-middle">{patient.patient_id}</td>
+                <td className="align-middle">
+                  {patient.scores && patient.scores.length > 0
+                    ? patient.scores.map(score =>
+                        renderScoreWithIcon(patient.id, score)
+                      )
+                    : 'Keine Scores'}
+                </td>
+                <td className="align-middle">
+                  {renderScoreCalculationLink(patient)}
+                  <Link
+                    to={`/patient/${patient.id}/edit`}
+                    className="btn btn-link me-2 "
                   >
-                    Patient Löschen
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleAddPatient} className="btn btn-link mt-3">
+                    Patient Editieren
+                  </Link>
+                  {!hasSavedScores(patient) && (
+                    <button
+                      onClick={() => handleDeletePatient(patient.id)}
+                      className="btn btn-link text-danger"
+                      style={{ color: 'red' }}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Link to="/patient" className="btn btn-link mt-3">
           Patienten registrieren
-        </button>
+        </Link>
       </div>
     </>
   );
