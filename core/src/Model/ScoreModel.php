@@ -229,7 +229,7 @@ class ScoreModel {
     
         $pdf->Write(0, $pdfContent, '', 0, 'L', true, 0, false, false, 0);
     
-        $pdfDirectory = __DIR__ . '/../pdf/';
+        $pdfDirectory = __DIR__ . '/../../pdf/';
         $pdfFileName = "PatientenScores_" . $patientIdStr . ".pdf";
         $pdfPath = $pdfDirectory . $pdfFileName;
     
