@@ -128,6 +128,7 @@ CREATE TABLE `patient_scores` (
   `criteria_19` BOOLEAN,
   `criteria_20` BOOLEAN,
   `total_score` DECIMAL(5,2),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `saved` BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `patients`(`id`)
