@@ -46,7 +46,7 @@ class ScoreController {
         
         $insertResult = $this->scoreModel->insertNewScoreRecord($patientId, $request, $totalScore);
         if ($insertResult) {
-            $lastInsertedScoreId = $this->scoreModel->lastScoreInsert();
+            $lastInsertedScoreId = $this->scoreModel->lastScoreInsert(); 
             return ['status' => 'success', 'message' => 'Score calculated and record inserted', 'score' => $totalScore, 'id' => $lastInsertedScoreId];
         } else {
             return ['status' => 'error', 'message' => 'Failed to insert score record'];
