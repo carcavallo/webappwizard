@@ -122,10 +122,33 @@ class PatientModel {
      * @return bool True on successful deletion, false on failure.
      */
     public function deletePatient($patientId) {
-        $sql = "DELETE FROM patients WHERE id = :patient_id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['patient_id' => $patientId]);
-    }
+        try {
+            $this->db->beginTransaction();
+    
+            $dependentTables = [
+                'patient_bisherige_lokale_therapie',
+                'patient_bisherige_systemtherapie',
+                'patient_aktuelle_lokale_therapie',
+                'patient_aktuelle_systemtherapie',
+                'patient_scores'
+            ];
+
+            foreach ($dependentTables as $table) {
+                $sql = "DELETE FROM {$table} WHERE patient_id = :patient_id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute(['patient_id' => $patientId]);
+            }
+
+            $sql = "DELETE FROM patients WHERE id = :patient_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['patient_id' => $patientId]);
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }    
 
     public function getPatientsByDoctorId($doctorId) {
         try {

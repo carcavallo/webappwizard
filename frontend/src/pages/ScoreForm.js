@@ -45,12 +45,17 @@ const ScoreForm = () => {
         Authorization: `Bearer ${token}`,
       };
       const payload = { patient_id: patientId, ...scoreData };
-      await axios.post('http://localhost/api/score', payload, { headers });
+
+      const response = await axios.post('http://localhost/api/score', payload, {
+        headers,
+      });
+
+      console.log(response);
 
       if (isIntermediateSave) {
         navigate('/dashboard');
       } else {
-        navigate(`/patient/${patientId}/score/display`);
+        navigate(`/patient/${patientId}/score/${response.data.id}/display`);
       }
     } catch (error) {
       console.error(error);

@@ -117,6 +117,10 @@ class ScoreModel {
         $stmt->execute([':score_id' => $scoreId]);
         return $stmt->rowCount() > 0;
     }
+
+    public function lastScoreInsert() {
+        return $this->db->lastInsertId();
+    }
     
     /**
      * Retrieves scores by patient ID.
