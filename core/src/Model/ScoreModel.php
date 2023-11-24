@@ -215,6 +215,7 @@ class ScoreModel {
      * @return string File path of the generated PDF.
      */    
     public function generatePdf($patientId) {
+        sleep(5);
         $patientIdStr = $this->getPatientIdStr($patientId);
     
         $pdf = new TCPDF();
@@ -235,7 +236,8 @@ class ScoreModel {
         foreach (glob($uploadDir . $screenshotPattern) as $screenshotPath) {
             // Extract date from filename
             $filenameParts = explode('_', basename($screenshotPath));
-            $date = $filenameParts[2] ?? 'Unknown'; // The date part is after 'screenshot_{patientId}_'
+            $dateWithExtension = $filenameParts[2] ?? 'Unknown.png'; // Include .png in the default value
+            $date = pathinfo($dateWithExtension, PATHINFO_FILENAME); 
     
             // Write date to PDF and adjust Y position
             $pdf->SetY($currentY);
