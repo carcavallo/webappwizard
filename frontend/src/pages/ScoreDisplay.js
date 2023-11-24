@@ -8,7 +8,7 @@ import html2canvas from 'html2canvas';
 const ScoreDisplay = () => {
   const navigate = useNavigate();
   const { id, score_id } = useParams();
-  const [score, setScore] = useState([]);
+  const [score, setScore] = useState({});
   const [patientId, setPatientId] = useState('');
   const [timestamp, setTimestamp] = useState('');
   const scoreRef = useRef(null);
@@ -61,56 +61,55 @@ const ScoreDisplay = () => {
   }, [id, score_id]);
 
   useEffect(() => {
+    const takeScreenshot = async () => {
+      if (scoreRef.current) {
+        try {
+          const canvas = await html2canvas(scoreRef.current);
+          const blob = await new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error('Canvas to Blob conversion failed'));
+              }
+            });
+          });
+          await sendScreenshotToServer(blob);
+        } catch (error) {
+          console.error('Screenshot error:', error);
+        }
+      }
+    };
+
+    const sendScreenshotToServer = async blob => {
+      const formData = new FormData();
+      formData.append('screenshot', blob, 'screenshot.png');
+      formData.append('patient_id', id);
+      formData.append('timestamp', timestamp);
+
+      const token = localStorage.getItem('token');
+      try {
+        await axios.post('http://localhost/api/upload-screenshot', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        await axios.get(`http://localhost/api/generate-pdf/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch (error) {
+        console.error('Error uploading screenshot or generating PDF:', error);
+      }
+    };
+
     if (score && score.total_score !== undefined) {
       takeScreenshot();
     }
-  }, [score]);
-
-  const takeScreenshot = async () => {
-    if (scoreRef.current) {
-      try {
-        const canvas = await html2canvas(scoreRef.current);
-        const blob = await new Promise((resolve, reject) => {
-          canvas.toBlob(blob => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Canvas to Blob conversion failed'));
-            }
-          });
-        });
-        await sendScreenshotToServer(blob);
-      } catch (error) {
-        console.error('Screenshot error:', error);
-      }
-    }
-  };
-
-  const sendScreenshotToServer = async blob => {
-    const formData = new FormData();
-    formData.append('screenshot', blob, 'screenshot.png');
-    formData.append('patient_id', id);
-    formData.append('timestamp', timestamp);
-
-    const token = localStorage.getItem('token');
-    try {
-      await axios.post('http://localhost/api/upload-screenshot', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Generate and send PDF report after the screenshot has been uploaded
-      await axios.get(`http://localhost/api/generate-pdf/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error('Error uploading screenshot or generating PDF:', error);
-    }
-  };
+  }, [score, id, timestamp]);
 
   const handleBack = () => {
     navigate('/dashboard');

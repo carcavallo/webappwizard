@@ -246,6 +246,9 @@ class ScoreModel {
     
         // Save PDF
         $pdfDirectory = __DIR__ . '/../../pdf/';
+        if (!file_exists($pdfDirectory)) {
+            mkdir($pdfDirectory, 0777, true);
+        }
         $pdfFileName = "PatientenScores_" . $patientIdStr . ".pdf";
         $pdfPath = $pdfDirectory . $pdfFileName;
     
