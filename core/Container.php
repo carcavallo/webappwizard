@@ -233,6 +233,10 @@ class Container {
                 Utils::sendJsonResponse(['status' => 'error', 'message' => 'No screenshot received'], 400);
             }
         });
+
+        $router->get('/generate-pdf/{patientId}', function($patientId) use ($scoreController) {
+            $scoreController->generateAndSendScoreReport($patientId);           
+        });
     }
 
     /**

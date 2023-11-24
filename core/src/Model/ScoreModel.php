@@ -98,8 +98,7 @@ class ScoreModel {
     
         if ($allCriteriaSet) {
             $scoreId = $this->db->lastInsertId();
-            $this->setScoreSaved(intval($scoreId));
-            $this->generateAndSendScoreReport($patientId, $totalScore);            
+            $this->setScoreSaved(intval($scoreId));       
         }
 
         return $scoreId;
@@ -188,9 +187,6 @@ class ScoreModel {
 
         if ($allCriteriaSet) {
             $patientId = $this->getPatientIdByScoreId($scoreId);
-            if ($patientId) {
-                $this->generateAndSendScoreReport($patientId, $totalScore);
-            }
         }
         return true;
     }
@@ -207,7 +203,6 @@ class ScoreModel {
         $stmt->execute([':id' => $scoreId]);
         return $stmt->rowCount() > 0;
     }
-
     /**
      * Generates a PDF report for a patient.
      *
@@ -215,7 +210,6 @@ class ScoreModel {
      * @return string File path of the generated PDF.
      */    
     public function generatePdf($patientId) {
-        sleep(5);
         $patientIdStr = $this->getPatientIdStr($patientId);
     
         $pdf = new TCPDF();
@@ -286,6 +280,13 @@ class ScoreModel {
         if ($doctorEmail) {
             $this->sendScoreEmail($doctorEmail, $pdfPath);
         }
+    }
+
+    public function getMostRecentScoreByPatientId($patientId) {
+        $sql = "SELECT * FROM patient_scores WHERE patient_id = :patient_id ORDER BY id DESC LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':patient_id' => $patientId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**

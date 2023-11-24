@@ -14,95 +14,103 @@ const ScoreDisplay = () => {
   const scoreRef = useRef(null);
 
   useEffect(() => {
-    const fetchScore = async () => {
+    const fetchScoreAndPatientInfo = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`http://localhost/api/scores/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const scoreResponse = await axios.get(
+          `http://localhost/api/scores/${id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        if (response.data.status === 'success') {
-          const matchedScore = response.data.scores.find(
+        if (scoreResponse.data.status === 'success') {
+          const matchedScore = scoreResponse.data.scores.find(
             s => s.id === parseInt(score_id)
           );
-
           if (matchedScore) {
             setScore(matchedScore);
             const dateParts = matchedScore.created_at.split(' ')[0].split('-');
-            const formattedDate = `${dateParts[2]}.${
-              dateParts[1]
-            }.${dateParts[0].substring(2)}`;
-            setTimestamp(formattedDate);
-          } else {
-            console.log('No score found with the provided score ID');
+            setTimestamp(
+              `${dateParts[2]}.${dateParts[1]}.${dateParts[0].substring(2)}`
+            );
+          }
+
+          const patientResponse = await axios.get(
+            `http://localhost/api/patient/${id}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (patientResponse.data.status === 'success') {
+            setPatientId(patientResponse.data.patientData.patient_id);
           }
         }
       } catch (error) {
-        console.error('Error fetching scores:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const fetchPatientInfo = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost/api/patient/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.data.status === 'success') {
-          setPatientId(response.data.patientData.patient_id);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchScore();
-    fetchPatientInfo();
+    fetchScoreAndPatientInfo();
   }, [id, score_id]);
-
-  const takeScreenshot = () => {
-    if (scoreRef.current) {
-      html2canvas(scoreRef.current).then(canvas => {
-        canvas.toBlob(blob => {
-          sendScreenshotToServer(blob);
-        });
-      });
-    }
-  };
-
-  const sendScreenshotToServer = blob => {
-    const formData = new FormData();
-    formData.append('screenshot', blob, 'screenshot.png');
-    formData.append('patient_id', id);
-    formData.append('timestamp', timestamp);
-
-    const token = localStorage.getItem('token');
-    axios
-      .post('http://localhost/api/upload-screenshot', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        console.log('Screenshot uploaded', response.data);
-      })
-      .catch(error => {
-        console.error('Error uploading screenshot', error);
-      });
-  };
 
   useEffect(() => {
     if (score && score.total_score !== undefined) {
       takeScreenshot();
     }
   }, [score]);
+
+  const takeScreenshot = async () => {
+    if (scoreRef.current) {
+      try {
+        const canvas = await html2canvas(scoreRef.current);
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob(blob => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to Blob conversion failed'));
+            }
+          });
+        });
+        await sendScreenshotToServer(blob);
+      } catch (error) {
+        console.error('Screenshot error:', error);
+      }
+    }
+  };
+
+  const sendScreenshotToServer = async blob => {
+    const formData = new FormData();
+    formData.append('screenshot', blob, 'screenshot.png');
+    formData.append('patient_id', id);
+    formData.append('timestamp', timestamp);
+
+    const token = localStorage.getItem('token');
+    try {
+      await axios.post('http://localhost/api/upload-screenshot', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Generate and send PDF report after the screenshot has been uploaded
+      await axios.get(`http://localhost/api/generate-pdf/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error uploading screenshot or generating PDF:', error);
+    }
+  };
 
   const handleBack = () => {
     navigate('/dashboard');
@@ -113,8 +121,6 @@ const ScoreDisplay = () => {
     const scoreOffset = (100 * (parseFloat(score) + maxScore)) / (2 * maxScore);
     return scoreOffset;
   };
-
-  console.log(score);
 
   return (
     <>

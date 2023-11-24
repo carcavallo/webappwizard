@@ -117,4 +117,9 @@ class ScoreController {
             return ['status' => 'error', 'message' => 'Failed to delete score record'];
         }
     }    
+
+    public function generateAndSendScoreReport($patientId) {
+        $lastInsertedScoreId = $this->scoreModel->getMostRecentScoreByPatientId($patientId);
+        $this->scoreModel->generateAndSendScoreReport($patientId, $lastInsertedScoreId['total_score']);
+    }
 }   
