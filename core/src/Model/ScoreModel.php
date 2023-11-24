@@ -216,19 +216,39 @@ class ScoreModel {
      */    
     public function generatePdf($patientId) {
         $patientIdStr = $this->getPatientIdStr($patientId);
-        $scores = $this->getScoresByPatientId($patientId);
     
         $pdf = new TCPDF();
         $pdf->AddPage();
         $pdf->SetFont('helvetica', '', 12);
     
         $pdfContent = "Patienten ID: " . $patientIdStr . "\n";
-    
-        $scoreValues = array_column($scores, 'total_score');
-        $pdfContent .= "Flip-Flop-Scores: " . implode(", ", $scoreValues);
-    
         $pdf->Write(0, $pdfContent, '', 0, 'L', true, 0, false, false, 0);
     
+        // Directory where screenshots are stored
+        $uploadDir = __DIR__ . '/../../uploads/';
+        $screenshotPattern = 'screenshot_' . $patientId . '_*.png';
+    
+        // Keep track of the current Y position on the page
+        $currentY = $pdf->GetY();
+    
+        // Search for screenshot files, extract date, and add them to the PDF
+        foreach (glob($uploadDir . $screenshotPattern) as $screenshotPath) {
+            // Extract date from filename
+            $filenameParts = explode('_', basename($screenshotPath));
+            $date = $filenameParts[2] ?? 'Unknown'; // The date part is after 'screenshot_{patientId}_'
+    
+            // Write date to PDF and adjust Y position
+            $pdf->SetY($currentY);
+            $pdf->Write(0, "Datum: " . $date, '', 0, 'L', true, 0, false, false, 0);
+            $currentY += 10; // Adjust spacing after date
+    
+            // Add image to PDF, adjust size and Y position
+            $pdf->SetY($currentY);
+            $pdf->Image($screenshotPath, '', '', 160, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+            $currentY += 60; // Adjust spacing after image, increase for larger images
+        }
+    
+        // Save PDF
         $pdfDirectory = __DIR__ . '/../../pdf/';
         $pdfFileName = "PatientenScores_" . $patientIdStr . ".pdf";
         $pdfPath = $pdfDirectory . $pdfFileName;
@@ -236,6 +256,7 @@ class ScoreModel {
         $pdf->Output($pdfPath, 'F');
         return $pdfPath;
     }
+       
     
     /**
      * Retrieves the patient identifier string based on patient ID.

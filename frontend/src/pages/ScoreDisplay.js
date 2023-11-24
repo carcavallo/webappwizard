@@ -31,8 +31,11 @@ const ScoreDisplay = () => {
 
           if (matchedScore) {
             setScore(matchedScore);
-            const dateOnly = matchedScore.created_at.split(' ')[0];
-            setTimestamp(dateOnly);
+            const dateParts = matchedScore.created_at.split(' ')[0].split('-');
+            const formattedDate = `${dateParts[2]}.${
+              dateParts[1]
+            }.${dateParts[0].substring(2)}`;
+            setTimestamp(formattedDate);
           } else {
             console.log('No score found with the provided score ID');
           }
@@ -117,7 +120,9 @@ const ScoreDisplay = () => {
     <>
       <NavBar />
       <div className="container mt-5">
-        <h1 className="mb-5">Berechneter Score für Patient: {patientId}</h1>
+        <h1 className="mb-5">
+          Berechneter Score für Patient {patientId} vom {timestamp}
+        </h1>
         {score && score.total_score !== undefined ? (
           <div ref={scoreRef} style={{ position: 'relative', height: '315px' }}>
             <img

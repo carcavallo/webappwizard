@@ -213,21 +213,17 @@ class Container {
 
         $router->post('/upload-screenshot', function() {
             if (!empty($_FILES['screenshot']['tmp_name']) && is_uploaded_file($_FILES['screenshot']['tmp_name'])) {
-                // Retrieve patient_id and score_id from the request
                 $patientId = $_POST['patient_id'] ?? 'unknown';
                 $timestamp = $_POST['timestamp'] ?? 'unknown';
         
-                // Define the path where you want to save the file
                 $targetDir = "uploads/";
                 if (!file_exists($targetDir)) {
                     mkdir($targetDir, 0777, true);
                 }
         
-                // Generate a file name using patient_id and score_id
                 $filename = "screenshot_{$patientId}_{$timestamp}.png";
                 $targetFile = $targetDir . $filename;
         
-                // Move the file from the temporary directory to your target directory
                 if (move_uploaded_file($_FILES['screenshot']['tmp_name'], $targetFile)) {
                     Utils::sendJsonResponse(['status' => 'success', 'message' => 'Screenshot uploaded successfully', 'filename' => $filename]);
                 } else {
@@ -237,7 +233,6 @@ class Container {
                 Utils::sendJsonResponse(['status' => 'error', 'message' => 'No screenshot received'], 400);
             }
         });
-         
     }
 
     /**
