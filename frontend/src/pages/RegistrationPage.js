@@ -259,7 +259,13 @@ const RegistrationPage = () => {
             Ich bin einverstanden, dass meine Daten zur Bearbeitung der Anfrage
             zur Nutzung des Flip-Flop-Rechners gespeichert werden dürfen. Die
             Informationen zum Datenschutz habe ich gelesen (
-            <a href="https://ck-care.ch/datenschutz/">DATENSCHUTZ | CK-CARE</a>
+            <a
+              href="https://ck-care.ch/datenschutz/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              DATENSCHUTZ | CK-CARE
+            </a>
             ).
           </label>
         </div>

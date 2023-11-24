@@ -91,7 +91,19 @@ class Container {
 
             $router->get("/user/activate/{userId}", function($userId) use ($doctorController) {
                 $response = $doctorController->activateUser($userId);
-                Utils::sendJsonResponse($response);
+                header('Content-Type: text/html; charset=utf-8');
+                if ($response['status'] === 'success') {
+                    echo '<!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body>
+                        <p>Account wurde erfolgreich aktiviert.</p>
+                    </body>
+                    </html>';
+                } 
             });
             
             $router->post('/validate-token', function() {
