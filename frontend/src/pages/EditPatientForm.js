@@ -319,7 +319,7 @@ const PatientForm = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log('asd');
+
       const processTherapieOptions = async (
         lokaleTherapie,
         systemtherapie,

@@ -50,8 +50,6 @@ const ScoreForm = () => {
         headers,
       });
 
-      console.log(response);
-
       if (isIntermediateSave) {
         navigate('/dashboard');
       } else {
