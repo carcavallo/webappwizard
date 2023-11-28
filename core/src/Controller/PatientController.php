@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Controller;
 
 use PR24\Model\PatientModel;
@@ -32,6 +33,7 @@ class PatientController {
         }
 
         $patientId = $this->patientModel->createPatient($patientData);
+
         if ($patientId) {
             return ['status' => 'success', 'message' => 'Patient creation successful', 'patientId' => $patientId];
         } else {
@@ -50,7 +52,6 @@ class PatientController {
         $genderLetter = strtolower(substr($request['geschlecht'] ?? '', 0, 1));
         $randomString = substr(md5(mt_rand()), 0, 6);
         $patientId = $genderLetter . $birthYear . '-' . $randomString;
-
         $patientData = [
             'patient_id' => $patientId,
             'doctor_id' => $request['doctor_id'] ?? null,
@@ -66,6 +67,7 @@ class PatientController {
             'aktuelle_systemtherapie_sonstiges' => $request['aktuelle_systemtherapie_sonstiges'] ?? null,
             'jucken_letzte_24_stunden' => $request['jucken_letzte_24_stunden'] ?? null,
         ];
+
         return $patientData;
     }
 
@@ -77,6 +79,7 @@ class PatientController {
      */    
     public function readPatient($patientId) {
         $patientData = $this->patientModel->getPatientById($patientId);
+
         if ($patientData) {
             return ['status' => 'success', 'patientData' => $patientData];
         } else {
@@ -131,8 +134,16 @@ class PatientController {
         }
     }
 
+
+    /**
+     * Retrieves previous therapies for a given patient.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array An array containing the status and either the data of previous therapies or an error message.
+     */
     public function getBisherigeTherapien($patientId) {
         $result = $this->patientModel->getBisherigeTherapien($patientId);
+
         if ($result !== false) {
             return ['status' => 'success', 'data' => $result];
         } else {
@@ -140,8 +151,15 @@ class PatientController {
         }
     }
 
+    /**
+     * Retrieves current therapies for a given patient.
+     *
+     * @param int $patientId The ID of the patient.
+     * @return array An array containing the status and either the data of current therapies or an error message.
+     */
     public function getAktuelleTherapien($patientId) {
         $result = $this->patientModel->getAktuelleTherapien($patientId);
+
         if ($result !== false) {
             return ['status' => 'success', 'data' => $result];
         } else {
@@ -149,6 +167,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Updates previous therapies for a given patient.
+     *
+     * @param int $patientId The ID of the patient to update therapies for.
+     * @return array An array indicating the status of the operation and a success or error message.
+     */
     public function updateBisherigeTherapien($patientId) {
         $request = json_decode(file_get_contents('php://input'), true);
         $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];
@@ -164,6 +188,12 @@ class PatientController {
         }
     }
 
+    /**
+     * Updates current therapies for a given patient.
+     *
+     * @param int $patientId The ID of the patient to update therapies for.
+     * @return array An array indicating the status of the operation and a success or error message.
+     */
     public function updateAktuelleTherapien($patientId) {
         $request = json_decode(file_get_contents('php://input'), true);
         $lokaleTherapieIds = $request['lokaleTherapie'] ?? [];

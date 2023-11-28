@@ -94,7 +94,6 @@ class DoctorModel {
     public function activateDoctorAndSetPassword($doctorId) {
         $newPassword = $this->generateRandomPassword();
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-
         $sql = "UPDATE doctors SET activated = 1, password = :password WHERE id = :id";
 
         try {
@@ -122,9 +121,11 @@ class DoctorModel {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomPassword = '';
+
         for ($i = 0; $i < $length; $i++) {
             $randomPassword .= $characters[rand(0, $charactersLength - 1)];
         }
+
         return $randomPassword;
     }
 
@@ -137,6 +138,7 @@ class DoctorModel {
     public function getDoctorIdByEmail($email) {
         $stmt = $this->db->prepare("SELECT id FROM doctors WHERE email = :email");
         $stmt->execute([':email' => $email]);
+
         return $stmt->fetchColumn();
     }
 
@@ -149,6 +151,7 @@ class DoctorModel {
     public function getDoctorEmailById($doctorId) {
         $stmt = $this->db->prepare("SELECT email FROM doctors WHERE id = :id");
         $stmt->execute([':id' => $doctorId]);
+
         return $stmt->fetchColumn();
     }    
 
@@ -167,6 +170,7 @@ class DoctorModel {
         if ($storedPassword && password_verify($password, $storedPassword)) {
             return true;
         }
+
         return false;
     }
 

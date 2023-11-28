@@ -83,6 +83,7 @@ class DoctorController {
         }
 
         $doctorId = $this->doctorModel->createDoctor($registrationData);
+        
         if ($doctorId) {
             $this->sendRegistrationConfirmationEmail($registrationData, $doctorId);
             return ['status' => 'success', 'message' => 'Registration successful', 'doctorId' => $doctorId];
@@ -99,6 +100,7 @@ class DoctorController {
      */
     public function activateUser($userId) {
         $isActivated = $this->doctorModel->isDoctorActivated($userId);
+
         if ($isActivated === true) {
             return ['status' => 'error', 'message' => 'Doctor already activated'];
         } elseif ($isActivated === null) {
@@ -106,6 +108,7 @@ class DoctorController {
         }
     
         $newPassword = $this->doctorModel->activateDoctorAndSetPassword($userId);
+
         if ($newPassword) {
             $doctorEmail = $this->doctorModel->getDoctorEmailById($userId);
             if ($this->sendPasswordEmail($doctorEmail, $newPassword)) {
@@ -138,13 +141,10 @@ class DoctorController {
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
             $mail->CharSet = 'UTF-8';
-
             $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Registration');
-            $mail->addAddress($_ENV['EMAIL_TO']);
-    
+            $mail->addAddress($_ENV['EMAIL_TO']);    
             $mail->isHTML(true);
-            $mail->Subject = 'Flip-Flop-Score Anmeldung';
-    
+            $mail->Subject = 'Flip-Flop-Score Anmeldung';    
             $body = "Es gibt eine neue Anmeldung von " . htmlspecialchars($registrationData['anrede']) . " " . htmlspecialchars($registrationData['titel']) . " " . htmlspecialchars($registrationData['vorname']) . " " . htmlspecialchars($registrationData['nachname']) . ".<br/><br>Die folgenden Daten wurden eingetragen:<br>";
             $keyMap = [
                 'email' => 'E-Mail',
@@ -167,12 +167,9 @@ class DoctorController {
             }
     
             $activateUrl = $_ENV['BASEDOMAIN'] . "/api/auth/user/activate/" . $userId;
-    
             $body .= "<br><a href='" . $activateUrl . "'>Benutzer freischalten und Zugang zusenden</a>";
-    
             $mail->Body = $body;
             $mail->AltBody = strip_tags(str_replace("<br>", "\n", $body));
-    
             $mail->send();
             return true;
         } catch (Exception $e) {
@@ -200,14 +197,11 @@ class DoctorController {
             $mail->Password = $_ENV['EMAIL_PASSWORD'];
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
-            $mail->CharSet = 'UTF-8';
-    
+            $mail->CharSet = 'UTF-8';    
             $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Registration');
-            $mail->addAddress($email);
-    
+            $mail->addAddress($email);    
             $mail->isHTML(true);
-            $mail->Subject = 'Ihre Flip-Flop-Score Anmeldung';
-            
+            $mail->Subject = 'Ihre Flip-Flop-Score Anmeldung';            
             $mail->Body = 'Ihr Konto wurde aktiviert.<br>'
                 . 'Ihr Benutzername: ' . htmlspecialchars($email) . '<br>'
                 . 'Ihr Passwort: ' . htmlspecialchars($password) . '<br><br>'
@@ -232,7 +226,6 @@ class DoctorController {
                 . 'Für Rückfragen stehen wir gerne unter info@ck-care.ch zur Verfügung.';
             
             $mail->AltBody = 'Ihr Konto wurde aktiviert. Ihr Benutzername: ' . htmlspecialchars($email) . '. Ihr Passwort: ' . htmlspecialchars($password);
-    
             $mail->send();
             return true;
         } catch (Exception $e) {

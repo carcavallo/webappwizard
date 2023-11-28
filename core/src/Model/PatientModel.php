@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Model;
 
 use PDO;
@@ -47,6 +48,7 @@ class PatientModel {
         $sql = "SELECT * FROM patients WHERE id = :patient_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['patient_id' => $patientId]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -189,7 +191,6 @@ class PatientModel {
             $stmt = $this->db->prepare("SELECT * FROM patient_aktuelle_systemtherapie WHERE patient_id = :patientId");
             $stmt->execute(['patientId' => $patientId]);
             $systemTherapie = $stmt->fetchAll();
-
             return ['lokaleTherapie' => $lokaleTherapie, 'systemtherapie' => $systemTherapie];
         } catch (PDOException $e) {
             error_log("PDOException in getAktuelleTherapien: " . $e->getMessage());

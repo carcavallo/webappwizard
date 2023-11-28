@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Dependencies;
 
 use Firebase\JWT\JWT;

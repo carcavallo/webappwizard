@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Model;
 
 use PDO;
@@ -37,6 +38,7 @@ class ScoreModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':patient_id' => $patientId]);
         $count = $stmt->fetchColumn();
+        
         return $count < 4;
     }
 
@@ -58,12 +60,14 @@ class ScoreModel {
         ];
     
         $totalScore = -0.65;
+
         foreach ($criteriaScores as $key => $value) {
             $criteria[$key] = isset($criteria[$key]) && $criteria[$key];
             if ($criteria[$key]) {
                 $totalScore += $value;
             }
         }
+
         return $totalScore;
     }
 
@@ -114,6 +118,7 @@ class ScoreModel {
         $sql = "UPDATE patient_scores SET saved = 1 WHERE id = :score_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':score_id' => $scoreId]);
+
         return $stmt->rowCount() > 0;
     }
 
@@ -131,6 +136,7 @@ class ScoreModel {
         $sql = "SELECT * FROM patient_scores WHERE patient_id = :patient_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':patient_id' => $patientId]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -145,6 +151,7 @@ class ScoreModel {
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':patient_id', $patientId, PDO::PARAM_INT);
         $stmt->execute();
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -170,6 +177,7 @@ class ScoreModel {
                 $value = false;
             }
         }
+
         $parameters = [':id' => $scoreId];
         $criteriaSet = [];
 
@@ -188,6 +196,7 @@ class ScoreModel {
         if ($allCriteriaSet) {
             $patientId = $this->getPatientIdByScoreId($scoreId);
         }
+
         return true;
     }
 
@@ -201,6 +210,7 @@ class ScoreModel {
         $sql = "DELETE FROM patient_scores WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $scoreId]);
+
         return $stmt->rowCount() > 0;
     }
     /**
@@ -211,48 +221,37 @@ class ScoreModel {
      */    
     public function generatePdf($patientId) {
         $patientIdStr = $this->getPatientIdStr($patientId);
-    
         $pdf = new TCPDF();
         $pdf->AddPage();
         $pdf->SetFont('helvetica', '', 12);
-    
         $pdfContent = "Patienten ID: " . $patientIdStr . "\n";
         $pdf->Write(0, $pdfContent, '', 0, 'L', true, 0, false, false, 0);
-    
-        // Directory where screenshots are stored
         $uploadDir = __DIR__ . '/../../uploads/';
         $screenshotPattern = 'screenshot_' . $patientId . '_*.png';
-    
-        // Keep track of the current Y position on the page
         $currentY = $pdf->GetY();
     
-        // Search for screenshot files, extract date, and add them to the PDF
         foreach (glob($uploadDir . $screenshotPattern) as $screenshotPath) {
-            // Extract date from filename
             $filenameParts = explode('_', basename($screenshotPath));
-            $dateWithExtension = $filenameParts[2] ?? 'Unknown.png'; // Include .png in the default value
-            $date = pathinfo($dateWithExtension, PATHINFO_FILENAME); 
-    
-            // Write date to PDF and adjust Y position
+            $dateWithExtension = $filenameParts[2] ?? 'Unknown.png';
+            $date = pathinfo($dateWithExtension, PATHINFO_FILENAME);
             $pdf->SetY($currentY);
             $pdf->Write(0, "Datum: " . $date, '', 0, 'L', true, 0, false, false, 0);
-            $currentY += 10; // Adjust spacing after date
-    
-            // Add image to PDF, adjust size and Y position
+            $currentY += 10;
             $pdf->SetY($currentY);
             $pdf->Image($screenshotPath, '', '', 160, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-            $currentY += 60; // Adjust spacing after image, increase for larger images
+            $currentY += 60;
         }
-    
-        // Save PDF
+
         $pdfDirectory = __DIR__ . '/../../pdf/';
+
         if (!file_exists($pdfDirectory)) {
             mkdir($pdfDirectory, 0777, true);
         }
+
         $pdfFileName = "PatientenScores_" . $patientIdStr . ".pdf";
         $pdfPath = $pdfDirectory . $pdfFileName;
-    
         $pdf->Output($pdfPath, 'F');
+
         return $pdfPath;
     }
        
@@ -268,6 +267,7 @@ class ScoreModel {
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':patient_id', $patientId, PDO::PARAM_INT);
         $stmt->execute();
+        
         return $stmt->fetchColumn();
     }
 
@@ -289,6 +289,7 @@ class ScoreModel {
         $sql = "SELECT * FROM patient_scores WHERE patient_id = :patient_id ORDER BY id DESC LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':patient_id' => $patientId]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -309,13 +310,10 @@ class ScoreModel {
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
         $mail->CharSet = 'UTF-8';
-
         $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Flip-Flop-Scores');
         $mail->addAddress($doctorEmail);
-
         $mail->isHTML(true);
         $mail->Subject = 'Patient Flip-Flop-Scores Report';
-
         $mail->Body = 'Die berechneten Flip-Flop-Scores finden Sie im Anhang.';
         $mail->addAttachment($pdfPath);
         $mail->send();
@@ -331,6 +329,7 @@ class ScoreModel {
         $sql = "SELECT patient_id FROM patient_scores WHERE id = :score_id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':score_id' => $scoreId]);
+        
         return $stmt->fetchColumn();
     }
 }

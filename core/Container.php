@@ -118,20 +118,6 @@ class Container {
                     Utils::sendJsonResponse(['valid' => false], 401);
                 }
             });
-
-            $router->post('/refresh-token', function() {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $oldToken = $data['token'] ?? '';
-            
-                $sessionValid = JWTMiddleware::isSessionValid($oldToken);
-            
-                if ($sessionValid) {
-                    $newToken = JWTMiddleware::createNewToken();
-                    Utils::sendJsonResponse(['newToken' => $newToken]);
-                } else {
-                    Utils::sendJsonResponse(['message' => 'Session expired or invalid token'], 401);
-                }
-            });
         });
 
         $router->post("/patient", function() use ($patientController) {

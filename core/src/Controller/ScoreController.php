@@ -1,4 +1,5 @@
 <?php
+
 namespace PR24\Controller;
 
 use PR24\Model\ScoreModel;
@@ -33,6 +34,7 @@ class ScoreController {
         }
     
         $totalScore = $this->scoreModel->calculateScore($request);
+
         if ($totalScore === false) {
             return ['status' => 'error', 'message' => 'Error calculating score'];
         }
@@ -45,6 +47,7 @@ class ScoreController {
         }
         
         $insertResult = $this->scoreModel->insertNewScoreRecord($patientId, $request, $totalScore);
+
         if ($insertResult) {
             $lastInsertedScoreId = $this->scoreModel->lastScoreInsert(); 
             return ['status' => 'success', 'message' => 'Score calculated and record inserted', 'score' => $totalScore, 'id' => $insertResult];
@@ -82,6 +85,7 @@ class ScoreController {
         }
     
         $allCriteriaSet = true;
+        
         for ($i = 1; $i <= 20; $i++) {
             $criteriaKey = 'criteria_' . $i;
             if (!isset($data[$criteriaKey]) || $data[$criteriaKey] === NULL) {
@@ -91,6 +95,7 @@ class ScoreController {
         }
     
         $updateResult = $this->scoreModel->updateScoreRecord($scoreId, $data);
+
         if ($updateResult && $allCriteriaSet) {
             $this->scoreModel->setScoreSaved($scoreId);
         }
@@ -118,8 +123,13 @@ class ScoreController {
         }
     }    
 
+    /**
+     * Generates and sends a score report for a specific patient.
+     *
+     * @param int $patientId The ID of the patient for whom the score report is to be generated and sent.
+     */
     public function generateAndSendScoreReport($patientId) {
         $lastInsertedScoreId = $this->scoreModel->getMostRecentScoreByPatientId($patientId);
         $this->scoreModel->generateAndSendScoreReport($patientId, $lastInsertedScoreId['total_score']);
     }
-}   
+}
