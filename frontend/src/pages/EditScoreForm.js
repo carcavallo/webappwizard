@@ -8,6 +8,7 @@ const EditScoreForm = () => {
   const { id: patientId } = useParams();
   const { score_id: scoreId } = useParams();
   const [scoreData, setScoreData] = useState({});
+  const [allCriteriaSet, setAllCriteriaSet] = useState(false);
 
   useEffect(() => {
     const loadScores = async () => {
@@ -38,7 +39,12 @@ const EditScoreForm = () => {
 
   const handleChange = e => {
     const value = e.target.value === 'yes' ? 1 : 0;
-    setScoreData({ ...scoreData, [e.target.name]: value });
+    const newScoreData = { ...scoreData, [e.target.name]: value };
+    setScoreData(newScoreData);
+    const allSet = Object.values(newScoreData).every(
+      criteria => criteria !== null
+    );
+    setAllCriteriaSet(allSet);
   };
 
   const handleIntermediateSave = () => {
@@ -210,16 +216,22 @@ const EditScoreForm = () => {
               </table>
             </div>
           </div>
-          <button type="submit" className="btn btn-link mb-3">
+          <button
+            type="submit"
+            className="btn btn-link mb-3"
+            disabled={!allCriteriaSet}
+          >
             Berechnen
           </button>
-          <button
-            type="button"
-            className="btn btn-link mb-3"
-            onClick={handleIntermediateSave}
-          >
-            Zwischenspeichern
-          </button>
+          {allCriteriaSet ? null : (
+            <button
+              type="button"
+              className="btn btn-link mb-3"
+              onClick={handleIntermediateSave}
+            >
+              Zwischenspeichern
+            </button>
+          )}
           <br />
           <button
             type="button"
