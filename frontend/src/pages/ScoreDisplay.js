@@ -139,13 +139,13 @@ const ScoreDisplay = () => {
               style={{
                 position: 'absolute',
                 left: `${getScorePosition(score.total_score)}%`,
-                bottom: '83px',
+                bottom: '92px',
               }}
             >
               <div
                 style={{
                   width: '5px',
-                  height: '89px',
+                  height: '86px',
                   backgroundColor: 'red',
                 }}
               />
