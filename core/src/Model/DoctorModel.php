@@ -33,6 +33,9 @@ class DoctorModel {
         } else {
             $doctorData['password'] = NULL;
         }
+
+        $doctorData['anrede'] = isset($doctorData['anrede']) && !empty($doctorData['anrede']) ? $doctorData['anrede'] : NULL;
+        $doctorData['titel'] = isset($doctorData['titel']) && !empty($doctorData['titel']) ? $doctorData['titel'] : NULL;
         
         $sql = "INSERT INTO doctors (anrede, titel, vorname, nachname, email, password, arbeitsstelle_name, arbeitsstelle_adresse, arbeitsstelle_stadt, arbeitsstelle_plz, arbeitsstelle_land, taetigkeitsbereich, taetigkeitsbereich_sonstiges) VALUES (:anrede, :titel, :vorname, :nachname, :email, :password, :arbeitsstelle_name, :arbeitsstelle_adresse, :arbeitsstelle_stadt, :arbeitsstelle_plz, :arbeitsstelle_land, :taetigkeitsbereich, :taetigkeitsbereich_sonstiges)";
 

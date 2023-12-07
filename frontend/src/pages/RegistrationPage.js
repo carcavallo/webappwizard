@@ -27,7 +27,6 @@ const RegistrationPage = () => {
 
   const validateForm = () => {
     if (
-      !formData.anrede ||
       !formData.vorname ||
       !formData.nachname ||
       !formData.email ||

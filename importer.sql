@@ -13,7 +13,7 @@ CREATE TABLE `admins` (
 -- Create `doctors` table
 CREATE TABLE `doctors` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `anrede` ENUM('Herr','Frau') NOT NULL,
+  `anrede` ENUM('Herr','Frau') DEFAULT NULL,
   `titel` VARCHAR(50) DEFAULT NULL,
   `vorname` VARCHAR(100) NOT NULL,
   `nachname` VARCHAR(100) NOT NULL,
@@ -135,5 +135,5 @@ CREATE TABLE `patient_scores` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO lokale_therapie_optionen (option_name) VALUES ('topische Glukokortikosteroide'), ('topische Calcineurininhibitoren');
-INSERT INTO systemtherapie_optionen (option_name) VALUES ('orale Antihistaminika'), ('orale Glukokortikosteroide'), ('Ciclosporin A'), ('Methotrexat'), ('Azathioprin'), ('Dupilumab'), ('Tralokinukmab'), ('Baricitinib'), ('Upadacitinib'), ('Abrocitinib');
+INSERT INTO systemtherapie_optionen (option_name) VALUES ('orale Antihistaminika'), ('orale Glukokortikosteroide'), ('Ciclosporin A'), ('Methotrexat'), ('Azathioprin'), ('Dupilumab'), ('Tralokinukmab'), ('Baricitinib'), ('Upadacitinib'), ('Abrocitinib'), ('Lebrikizumab');
 

@@ -112,7 +112,7 @@ class Container {
             
                 $validationResult = JWTMiddleware::validateToken($token);
             
-                if ($validationResult) {
+                if ($validationResult['status'] == 'success') {
                     Utils::sendJsonResponse(['valid' => true]);
                 } else {
                     Utils::sendJsonResponse(['valid' => false], 401);

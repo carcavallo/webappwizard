@@ -310,11 +310,11 @@ class ScoreModel {
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
         $mail->CharSet = 'UTF-8';
-        $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Flip-Flop-Scores');
+        $mail->setFrom($_ENV['EMAIL_FROM'], 'CK-Care Flip-Flop-Score');
         $mail->addAddress($doctorEmail);
         $mail->isHTML(true);
-        $mail->Subject = 'Patient Flip-Flop-Scores Report';
-        $mail->Body = 'Die berechneten Flip-Flop-Scores finden Sie im Anhang.';
+        $mail->Subject = 'Patient Flip-Flop-Score Report';
+        $mail->Body = 'Den berechneten Flip-Flop-Score finden Sie im Anhang.';
         $mail->addAttachment($pdfPath);
         $mail->send();
     }

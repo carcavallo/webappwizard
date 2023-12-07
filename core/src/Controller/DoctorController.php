@@ -35,7 +35,7 @@ class DoctorController {
             $token = [
                 "iss" => $_ENV['BASEDOMAIN'],
                 "iat" => time(),
-                "exp" => time() + 7200,
+                "exp" => time() + 3600,
                 "data" => [
                     "email" => $credentials['email'],
                     "userId" => $userId
