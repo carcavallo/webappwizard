@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       className="d-flex justify-content-center align-items-center"
       style={{ height: '100vh' }}
     >
-      <button onClick={handleExport} className="btn btn-link">
+      <button onClick={handleExport} className="btn btn-link link custom-link">
         Patientendaten exportieren
       </button>
     </div>

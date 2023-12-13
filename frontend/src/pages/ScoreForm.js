@@ -193,7 +193,7 @@ const ScoreForm = () => {
           </div>
           <button
             type="submit"
-            className="btn btn-link mb-3"
+            className="btn btn-link mb-3 link custom-link"
             disabled={!allCriteriaSet}
           >
             Berechnen
@@ -201,7 +201,7 @@ const ScoreForm = () => {
           {allCriteriaSet ? null : (
             <button
               type="button"
-              className="btn btn-link mb-3"
+              className="btn btn-link mb-3 link custom-link"
               onClick={handleIntermediateSave}
             >
               Zwischenspeichern
@@ -210,7 +210,7 @@ const ScoreForm = () => {
           <br />
           <button
             type="button"
-            className="btn btn-link mb-3"
+            className="btn btn-link mb-3 link custom-link"
             onClick={handleBack}
           >
             Zurück

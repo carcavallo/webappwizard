@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import NavBar from '../components/Navigation';
 
 const HomePage = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -53,59 +54,61 @@ const HomePage = () => {
   };
 
   return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ height: '100vh' }}
-    >
-      <div className="text-center">
-        <h1>Flip-Flop-App</h1>
-        <p className="lead">
-          Willkommen zu der Flip-Flop-App, bitte loggen Sie sich ein, um
-          fortzufahren.
-        </p>
-        {registrationSuccess && (
-          <div className="alert alert-success" role="alert">
-            Danke für Ihre Anmeldung, wir werden Ihre Daten prüfen und Ihnen
-            eine Email mit den Zugangsdaten schicken.
-          </div>
-        )}
-        {loginError && (
-          <div className="alert alert-danger" role="alert">
-            {loginError}
-          </div>
-        )}
-        <div className="d-inline-block">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group mb-2">
-              <input
-                type="email"
-                name="email"
-                className="form-control"
-                placeholder="Email"
-                value={credentials.email}
-                onChange={handleChange}
-              />
+    <>
+      <NavBar />
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: '60vh' }}
+      >
+        <div className="text-center">
+          <h1>CK-CARE's Flip Flop App</h1>
+          <p className="lead">Bitte loggen Sie sich ein, um fortzufahren.</p>
+          {registrationSuccess && (
+            <div className="alert alert-success" role="alert">
+              Danke für Ihre Anmeldung, wir werden Ihre Daten prüfen und Ihnen
+              eine Email mit den Zugangsdaten schicken.
             </div>
-            <div className="form-group mb-3">
-              <input
-                type="password"
-                name="password"
-                className="form-control"
-                placeholder="Passwort"
-                value={credentials.password}
-                onChange={handleChange}
-              />
+          )}
+          {loginError && (
+            <div className="alert alert-danger" role="alert">
+              {loginError}
             </div>
-            <button type="submit" className="btn btn-link">
-              Login
-            </button>
-          </form>
-          <div className="mt-3">
-            <a href="/register">Sie haben noch kein Konto? Registrieren</a>
+          )}
+          <div className="d-inline-block">
+            <form onSubmit={handleSubmit}>
+              <div className="form-group mb-2">
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  placeholder="Email"
+                  value={credentials.email}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group mb-3">
+                <input
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  placeholder="Passwort"
+                  value={credentials.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <button type="submit" className="btn btn-link link custom-link">
+                Login
+              </button>
+            </form>
+            <div className="mt-3">
+              <a className="link custom-link" href="/register">
+                Sie haben noch kein Konto? Registrieren
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -556,13 +556,13 @@ const PatientForm = () => {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-link mb-3">
+          <button type="submit" className="btn btn-link mb-3 link custom-link">
             Patientendaten Speichern
           </button>
           <br />
           <button
             type="button"
-            className="btn btn-link mb-3"
+            className="btn btn-link mb-3 link custom-link"
             onClick={handleBack}
           >
             Zurück

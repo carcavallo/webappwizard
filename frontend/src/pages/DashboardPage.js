@@ -100,7 +100,10 @@ const DashboardPage = () => {
     }
 
     return (
-      <Link to={`/patient/${patient.id}/score`} className="btn btn-link">
+      <Link
+        to={`/patient/${patient.id}/score`}
+        className="btn btn-link link custom-link"
+      >
         Score berechnen
       </Link>
     );
@@ -136,7 +139,7 @@ const DashboardPage = () => {
                   {renderScoreCalculationLink(patient)}
                   <Link
                     to={`/patient/${patient.id}/edit`}
-                    className="btn btn-link me-2 "
+                    className="btn btn-link me-2 link custom-link"
                   >
                     Patient Editieren
                   </Link>
@@ -154,7 +157,7 @@ const DashboardPage = () => {
             ))}
           </tbody>
         </table>
-        <Link to="/patient" className="btn btn-link mt-3">
+        <Link to="/patient" className="btn btn-link mt-3 link custom-link">
           Patienten registrieren
         </Link>
       </div>

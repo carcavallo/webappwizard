@@ -62,7 +62,7 @@ const AdminPage = () => {
                 onChange={e => setPassword(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-link">
+            <button type="submit" className="btn btn-link link custom-link">
               Login
             </button>
           </form>
