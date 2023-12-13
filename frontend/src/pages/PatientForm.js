@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/Navigation';
 
 const PatientForm = () => {
   const navigate = useNavigate();
@@ -203,7 +202,6 @@ const PatientForm = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container mt-5">
         <h1>Patienten registrieren</h1>
         {error && (

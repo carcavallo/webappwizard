@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/Navigation';
 
 const PatientForm = () => {
   const { id: patientId } = useParams();
@@ -367,7 +366,6 @@ const PatientForm = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container mt-5">
         <h1>Patienten editieren</h1>
         {error && (

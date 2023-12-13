@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/Navigation';
 
 const EditScoreForm = () => {
   const navigate = useNavigate();
@@ -125,7 +124,6 @@ const EditScoreForm = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container mt-5">
         <h1 className="mb-4">Flip-Flop-Score Formular</h1>
         <form onSubmit={handleSubmit}>

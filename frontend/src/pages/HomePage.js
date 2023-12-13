@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/Navigation';
 
 const HomePage = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -55,13 +54,12 @@ const HomePage = () => {
 
   return (
     <>
-      <NavBar />
       <div
         className="d-flex justify-content-center align-items-center"
         style={{ height: '60vh' }}
       >
         <div className="text-center">
-          <h1>CK-CARE's Flip Flop App</h1>
+          <h1>Flip Flop App</h1>
           <p className="lead">Bitte loggen Sie sich ein, um fortzufahren.</p>
           {registrationSuccess && (
             <div className="alert alert-success" role="alert">

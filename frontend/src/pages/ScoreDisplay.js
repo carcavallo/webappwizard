@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import scoreScaleImage from '../assets/score.png';
-import NavBar from '../components/Navigation';
 import html2canvas from 'html2canvas';
 
 const ScoreDisplay = () => {
@@ -123,7 +122,6 @@ const ScoreDisplay = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container mt-5">
         <h1 className="mb-5">
           Berechneter Score für Patient {patientId} vom {timestamp}

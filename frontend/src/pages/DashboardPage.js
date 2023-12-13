@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/Navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -111,7 +110,6 @@ const DashboardPage = () => {
 
   return (
     <>
-      <NavBar />
       <div className="container mt-5">
         <h1 className="mb-4">Patientenliste</h1>
         <table className="table">
