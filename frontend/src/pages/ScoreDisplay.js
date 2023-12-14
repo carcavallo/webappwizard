@@ -115,9 +115,14 @@ const ScoreDisplay = () => {
   };
 
   const getScorePosition = score => {
-    const maxScore = 12;
-    const scoreOffset = (100 * (parseFloat(score) + maxScore)) / (2 * maxScore);
-    return scoreOffset;
+    const scaleStart = 10;
+    const scaleEnd = 90;
+    const scaleLength = scaleEnd - scaleStart;
+    const minScore = -14.76;
+    const maxScore = 12.63;
+    const normalizedScore = (score - minScore) / (maxScore - minScore);
+    const position = scaleStart + normalizedScore * scaleLength;
+    return position;
   };
 
   return (
@@ -137,24 +142,25 @@ const ScoreDisplay = () => {
               style={{
                 position: 'absolute',
                 left: `${getScorePosition(score.total_score)}%`,
-                bottom: '92px',
+                bottom: '40px',
               }}
             >
               <div
                 style={{
-                  width: '5px',
-                  height: '86px',
+                  width: '3px',
+                  height: '105px',
                   backgroundColor: 'red',
                 }}
               />
               <div
                 style={{
                   position: 'absolute',
-                  bottom: '90px',
+                  bottom: '107px',
+                  color: 'red',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  color: 'black',
                   fontWeight: 'bold',
+                  fontSize: '40px',
                 }}
               >
                 {score.total_score}
@@ -162,7 +168,7 @@ const ScoreDisplay = () => {
             </div>
             <button
               type="button"
-              className="btn btn-link mb-3 link custom-link"
+              className="btn btn-link mb-3"
               onClick={handleBack}
             >
               Zurück

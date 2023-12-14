@@ -16,7 +16,11 @@ const NavBar = ({ username }) => {
 
   const isNotHomePage = () => {
     const homePagePath = '/';
-    return location.pathname !== homePagePath;
+    const registerPagePath = '/register';
+    return (
+      location.pathname !== homePagePath &&
+      location.pathname !== registerPagePath
+    );
   };
 
   return (
@@ -47,7 +51,7 @@ const NavBar = ({ username }) => {
         </Container>
       </div>
 
-      <Navbar bg="light" expand="lg" className="custom-navbar">
+      <Navbar expand="lg" className="custom-navbar">
         <Container>
           <Navbar.Brand href="/">
             <img
