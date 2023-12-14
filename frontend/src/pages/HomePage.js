@@ -59,7 +59,7 @@ const HomePage = () => {
         style={{ height: '60vh' }}
       >
         <div className="text-center">
-          <h1>Flip Flop App</h1>
+          <h1>Flip Flop Score App</h1>
           <p className="lead">Bitte loggen Sie sich ein, um fortzufahren.</p>
           {registrationSuccess && (
             <div className="alert alert-success" role="alert">
